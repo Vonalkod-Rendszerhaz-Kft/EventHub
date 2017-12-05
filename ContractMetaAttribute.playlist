@@ -1,0 +1,1 @@
+<Playlist Version="1.0"><Add Test="Vrh.EventHub.Core.Test.ContractMetaAttributeTest.ContractMetaAttribute_IsAttribute" /><Add Test="Vrh.EventHub.Core.Test.ContractMetaAttributeTest.ContractMetaAttribute_Description" /></Playlist>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>$title$</id>
+    <version>$version$</version>
+    <title>Messaging and event forwarding between application modules</title>
+    <authors>Görcsös Zoltán</authors>
+    <owners>Vonalkód Rendszerház Kft.</owners>
+    <tags>Messaging, Event forwarding, Log4Pro, Inter Application Communication</tags>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+    <releaseNotes>
+      v1.0.0-pre-alpha (2017.12.04)
+        This package is pre-alpha!!!
+
+    </releaseNotes>
+    <projectUrl>http://redmine.vonalkod.hu/projects/vrh-eventhub-core</projectUrl>
+    <dependencies>
+      <dependency id="Vrh.Logger" version="1.2.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\LogConfig.xml" target="" exclude="..\LogConfig.xml"/>
+    <file src="..\ReadMe.md" target="content\Vrh.NugetModuls.Documentations\Vrh.EventHub.Core" />
+    <file src="Install.ps1" target="tools"/>
+  </files>
+</package>

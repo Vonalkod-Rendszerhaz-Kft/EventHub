@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>7e210cd2-9505-49f0-adf6-175e1825d607</ProjectGuid>
+    <ProjectGuid>{7E210CD2-9505-49F0-ADF6-175E1825D607}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Vrh.EventHub.Core</RootNamespace>
@@ -28,28 +28,90 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Vrh.EventHub.Core.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System"/>
-    
-    <Reference Include="System.Core"/>
-    <Reference Include="System.Xml.Linq"/>
-    <Reference Include="System.Data.DataSetExtensions"/>
-    
-    
-    <Reference Include="Microsoft.CSharp"/>
-    
-    <Reference Include="System.Data"/>
-    
-    <Reference Include="System.Net.Http"/>
-    
-    <Reference Include="System.Xml"/>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="VRH.Common, Version=1.13.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\VRH.Common.1.13.0\lib\net35\VRH.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.2\lib\net40\Vrh.LinqXMLProcessor.Base.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vrh.Logger, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.Logger.1.2.0\lib\net45\Vrh.Logger.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="DefaultCallbackMessage.cs" />
+    <Compile Include="Exceptions\CollectorExceptions.cs" />
+    <Compile Include="Exceptions\ContractExceptions.cs" />
+    <Compile Include="Exceptions\EmitterExceptions.cs" />
+    <Compile Include="Exceptions\MessageExceptions.cs" />
+    <Compile Include="Interfaces\BaseCollector.cs" />
+    <Compile Include="Interfaces\BaseContract.cs" />
+    <Compile Include="Interfaces\BaseEmitter.cs" />
+    <Compile Include="Interfaces\BaseMessage.cs" />
+    <Compile Include="EventHub.Core.Config.cs" />
+    <Compile Include="Interfaces\BaseChannel.cs" />
+    <Compile Include="Interfaces\ContractMetaAttribute.cs" />
+    <Compile Include="Interfaces\ICollector.cs" />
+    <Compile Include="Interfaces\IContract.cs" />
+    <Compile Include="EventHub.cs" />
+    <Compile Include="Exceptions\EventHubExceptions.cs" />
+    <Compile Include="Interfaces\IChannel.cs" />
+    <Compile Include="Interfaces\IMessage.cs" />
+    <Compile Include="Interfaces\IEmitter.cs" />
+    <Compile Include="Interfaces\MessageMetaAttribute.cs" />
+    <Compile Include="MessageEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="forNuGet packaging\Install.ps1" />
+    <None Include="packages.config" />
+    <None Include="ReadMe.md" />
+    <None Include="forNuGet packaging\Vrh.EventHub.Core.nuspec" />
+    <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.LinqXMLProcessor.Base\ReadMe.md" />
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />
+    <None Include="_CreateNewNuGetPackage\Config.ps1" />
+    <None Include="_CreateNewNuGetPackage\DoNotModify\CreateNuGetPackage.ps1" />
+    <None Include="_CreateNewNuGetPackage\DoNotModify\New-NuGetPackage.ps1" />
+    <None Include="_CreateNewNuGetPackage\DoNotModify\UploadNuGetPackage.ps1" />
+    <None Include="_CreateNewNuGetPackage\RunMeToUploadNuGetPackage.cmd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="EventHub.Core.Config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="LogConfig.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="_CreateNewNuGetPackage\DoNotModify\NuGet.exe" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>REM Create a NuGet package for this project and place the .nupkg file in the project's output directory.
+REM If you see this in Visual Studio's Error List window, check the Output window's Build tab for the actual error.
+ECHO Creating NuGet package in Post-Build event...
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "&amp; '$(ProjectDir)_CreateNewNuGetPackage\DoNotModify\CreateNuGetPackage.ps1' -ProjectFilePath '$(ProjectPath)' -OutputDirectory '$(TargetDir)' -BuildConfiguration '$(ConfigurationName)' -BuildPlatform '$(PlatformName)' -Verbose"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -57,5 +119,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-
- </Project>
+</Project>

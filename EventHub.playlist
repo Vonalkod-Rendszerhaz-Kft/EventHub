@@ -1,0 +1,1 @@
+<Playlist Version="1.0"><Add Test="Vrh.EventHub.Core.Test.EventHubTests.EventHub_GetEmitter" /><Add Test="Vrh.EventHub.Core.Test.EventHubTests.EventHub_GetCollector" /></Playlist>
