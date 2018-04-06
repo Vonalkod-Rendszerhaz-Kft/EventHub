@@ -1,67 +1,123 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Vrh.EventHub.Core.Interfaces;
+using Vrh.EventHub.Core;
+using Vrh.Logger;
 
 namespace Vrh.EventHub.Protocols.InsideApplication
 {
-    /// <summary>
-    /// Alkalmazáson belüli üzenetközvetítést megvalósító channel implementáció
-    /// </summary>
+
     public class InsideApplicationChannel : BaseChannel
     {
-        public override void RegisterMe()
+        /// <summary>
+        /// Send (Aszinkron) üzenetküldés csatornaimplementáció
+        /// </summary>
+        /// <typeparam name="TMessage">A küldött üzenet</typeparam>
+        /// <param name="message">üzenet</param>
+        public override void Send(EventHubMessage message)
         {
-
+            Task.Run(() => HandleInputMessages(message));
         }
 
-        protected override IEmitter EmitterFactory(string id)
+        /// <summary>
+        /// Inicializálja a csatorna infrastruktúráját
+        /// </summary>
+        public override void InitializeChannelInfrastructure()
         {
-
-            return null;
+            base.InitializeChannelInfrastructure();
         }
 
-        protected override ICollector CollectorFactory(string id)
+        /// <summary>
+        /// Redis csatorna konfigurált timeoutja
+        /// </summary>
+        /// <returns></returns>
+        public override TimeSpan GetChannelTimout()
         {
-
-            return null;
+            return Configuration.ChannelTimeout;
         }
 
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
+        /// <summary>
+        /// A csatorna konfigurációja
+        /// </summary>
+        internal EventHubInsideApplicationConfig Configuration
         {
-            if (!disposedValue)
+            get
             {
-                if (disposing)
+                lock (_getConfigurationLocker)
                 {
-                    // TODO: dispose managed state (managed objects).
+                    if (_configuration == null)
+                    {
+                        _configuration = new EventHubInsideApplicationConfig(ConfigFile);
+                    }
+                    return _configuration;
                 }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
-                disposedValue = true;
             }
         }
 
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~InsideApplicationChannel() {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
+        /// <summary>
+        /// A konfiguráció (XMLProcesszor)
+        /// </summary>
+        private EventHubInsideApplicationConfig _configuration = null;
 
-        // This code added to correctly implement the disposable pattern.
-        public override void Dispose()
+        /// <summary>
+        /// Visszadja, hogy mi a RedisPubSub csatorna konfigurációs fájlja  
+        /// </summary>
+        private string ConfigFile
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
+            get
+            {
+                string config = ConfigurationManager.AppSettings[$"{MODUL_PREFIX}:Config"];
+                if (String.IsNullOrEmpty(config))
+                {
+                    config = "Vrh.EventHub.InsideApplication.Config.xml/Vrh.EventHub.InsideApplication";
+                }
+                VrhLogger.Log(
+                    $"Used EventHub.InsideApplication channel configuration: {config}",
+                    new Dictionary<string, string>()
+                    {
+                        {"Channel id", ChannelId},
+                        {"Configuration", config },
+                    },
+                    null,
+                    LogLevel.Information,
+                    this.GetType());
+                return config;
+            }
         }
-        #endregion
+
+        /// <summary>
+        /// Lockolja a Configuration elérést, hogy mindenki garantáltan ugyanazzal a referenciával dolgozon
+        /// </summary>
+        private readonly object _getConfigurationLocker = new object();
+
+        /// <summary>
+        /// Üzenet érkezik  acsatornára
+        /// </summary>
+        /// <param name="channel">csatorna szonosító 
+        ///     (redis oldalnak kell (illetve mindig visszaküldi a csatorna id-t is), 
+        ///         mivel csatornánként külön subscriberünk van, ezt nem használjuk ki, mindig ChannelId-val egyezik)</param>
+        /// <param name="message">Érkezett üzenet (json serializált )</param>
+        private void HandleInputMessages(EventHubMessage message)
+        {
+            // csak átpaszolja (aszinkron) az érkező üzenetet a Core-nak
+            //Task.Run(() => _coreInputMessageHandler.DynamicInvoke(new object[] { message }));
+            Task.Run(() => _coreInputMessageHandler.Invoke(message));
+        }
+
+        #region IDisposable Support
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
+
+        #endregion IDisposable Support
+
+        /// <summary>
+        /// A modul egyedi prefixe
+        /// </summary>
+        internal const string MODUL_PREFIX = "Vrh.EventHub.InsideApplication";
     }
 }

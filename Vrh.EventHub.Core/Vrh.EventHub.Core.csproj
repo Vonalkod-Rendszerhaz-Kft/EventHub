@@ -31,8 +31,8 @@
     <DocumentationFile>bin\Release\Vrh.EventHub.Core.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -48,37 +48,27 @@
       <HintPath>..\packages\VRH.Common.1.13.0\lib\net35\VRH.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.2\lib\net40\Vrh.LinqXMLProcessor.Base.dll</HintPath>
+    <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.3\lib\net40\Vrh.LinqXMLProcessor.Base.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vrh.Logger, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.Logger.1.2.0\lib\net45\Vrh.Logger.dll</HintPath>
+    <Reference Include="Vrh.Logger, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.Logger.1.4.0\lib\net45\Vrh.Logger.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DefaultCallbackMessage.cs" />
-    <Compile Include="Exceptions\CollectorExceptions.cs" />
-    <Compile Include="Exceptions\ContractExceptions.cs" />
-    <Compile Include="Exceptions\EmitterExceptions.cs" />
-    <Compile Include="Exceptions\MessageExceptions.cs" />
-    <Compile Include="Interfaces\BaseCollector.cs" />
-    <Compile Include="Interfaces\BaseContract.cs" />
-    <Compile Include="Interfaces\BaseEmitter.cs" />
-    <Compile Include="Interfaces\BaseMessage.cs" />
-    <Compile Include="EventHub.Core.Config.cs" />
+    <Compile Include="Internals\ChannelRegister.cs" />
     <Compile Include="Interfaces\BaseChannel.cs" />
-    <Compile Include="Interfaces\ContractMetaAttribute.cs" />
-    <Compile Include="Interfaces\ICollector.cs" />
-    <Compile Include="Interfaces\IContract.cs" />
-    <Compile Include="EventHub.cs" />
+    <Compile Include="Internals\HandlerRegister.cs" />
+    <Compile Include="Interfaces\EventHubMessage.cs" />
+    <Compile Include="Interfaces\Request.cs" />
+    <Compile Include="Interfaces\Response.cs" />
+    <Compile Include="Internals\MockChannel.cs" />
+    <Compile Include="Internals\RegisteredCallWait.cs" />
+    <Compile Include="Internals\Vrh.EventHub.Core.Config.cs" />
+    <Compile Include="EventHubCore.cs" />
     <Compile Include="Exceptions\EventHubExceptions.cs" />
-    <Compile Include="Interfaces\IChannel.cs" />
-    <Compile Include="Interfaces\IMessage.cs" />
-    <Compile Include="Interfaces\IEmitter.cs" />
-    <Compile Include="Interfaces\MessageMetaAttribute.cs" />
-    <Compile Include="MessageEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -97,7 +87,7 @@
     <None Include="_CreateNewNuGetPackage\RunMeToUploadNuGetPackage.cmd" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="EventHub.Core.Config.xml">
+    <Content Include="Vrh.EventHub.Core.Config.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="LogConfig.xml">

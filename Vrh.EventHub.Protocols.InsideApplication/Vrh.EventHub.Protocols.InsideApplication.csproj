@@ -30,11 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -46,38 +47,40 @@
       <HintPath>..\packages\VRH.Common.1.13.0\lib\net35\VRH.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vrh.EventHub.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.EventHub.Core.1.0.0-pre-alpha\lib\net45\Vrh.EventHub.Core.dll</HintPath>
+    <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.3\lib\net40\Vrh.LinqXMLProcessor.Base.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.2\lib\net40\Vrh.LinqXMLProcessor.Base.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Vrh.Logger, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.Logger.1.2.0\lib\net45\Vrh.Logger.dll</HintPath>
+    <Reference Include="Vrh.Logger, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.Logger.1.4.0\lib\net45\Vrh.Logger.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InsideApplicationChannel.cs" />
-    <Compile Include="InsideApplicationEmitter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Vrh.EventHub.InsideApplication.Config.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
-    <None Include="Vrh.NugetModuls.Documentations\Vrh.EventHub.Core\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.LinqXMLProcessor.Base\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="EventHub.Core.Config.xml">
+    <None Include="LogConfig.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="LogConfig.xml">
+    <Content Include="Vrh.EventHub.InsideApplication.Config.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Vrh.EventHub.Core\Vrh.EventHub.Core.csproj">
+      <Project>{7e210cd2-9505-49f0-adf6-175e1825d607}</Project>
+      <Name>Vrh.EventHub.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

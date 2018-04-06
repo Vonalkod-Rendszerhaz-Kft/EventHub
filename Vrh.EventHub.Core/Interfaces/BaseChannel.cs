@@ -1,155 +1,210 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Vrh.EventHub.Core.Exceptions;
+using Vrh.Logger;
 
-namespace Vrh.EventHub.Core.Interfaces
+namespace Vrh.EventHub.Core
 {
     /// <summary>
-    /// Csatorna ősosztály, minden megvalósított csatorna ebből származik!
+    /// Alap csatorna implementáció
+    /// Az EventHub megoldásban használható konkrét csatorna implementzációknak ebből kell származniuk!
     /// </summary>
-    public class BaseChannel : IChannel, IDisposable
+    public class BaseChannel : IDisposable
     {
         /// <summary>
-        /// Visszadja a csatorna típusát
+        /// Üzenetküldés a csatornán
+        ///     Konkrét csatorna implementációban mindig felülírandó,
+        ///     az adott csatornának megfelelő konkrét üzenetküldés implementációjával!!! 
         /// </summary>
-        public string ChannelType
+        /// <param name="message">üzenet</param>
+        public virtual void Send(EventHubMessage message)
         {
-            get
-            {
-                return this.GetType().FullName;
-            }
+            throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Felülírandó!!!
+        /// Inicializálja a channel infrastruktúráját, 
+        ///     a konkrét implementácoiója függ a konkrét csatorna megvalósítástól
+        ///     A függvény hívását követően azonban az üzenettovábító infrastruktúrának maradéktalanul müködőképesnek kell lennie (startup)
+        /// A csatorna megvalósításban a Core visszahhívási delegate mentéséhez mindig meg kellhívni a base-ben lévő implementácót!!! (base.InitializeChannelInfrastructure(eventHubCoreInputMessageHandler))
         /// </summary>
-        public virtual void Dispose()
+        public virtual void InitializeChannelInfrastructure()
         {
-            throw new NotImplementedException("Must override this!!!");
+            _coreInputMessageHandler = HandleInputMessage;
+            VrhLogger.Log("Base InitializeChannelInfrastructure called", LogLevel.Debug, this.GetType());
         }
 
         /// <summary>
-        /// Felülírandó!!!
+        /// A beérkező üzenetek kezelője
+        /// Ez a metódus gondoskodik róla, hogy meghívja az érketzett üzenethez tartozó Handlert
+        /// Ha nincs várt visszatérési érték (a hívandó handler result-ja void), akkor aszinkronhívja
+        /// Ha van várt visszatérési érték (a hívandó handler result-ja nem void), akkor szinkron hívhja, 
+        ///     és a kapott választ elküldi a csatornára
         /// </summary>
-        public virtual void RegisterMe()
+        /// <param name="msg">EventHub üzenet</param>
+        public void HandleInputMessage(EventHubMessage msg)
         {
-            if (this.GetType().FullName != typeof(BaseChannel).FullName)
+            var logData = new Dictionary<string, string>
             {
-                throw new NotImplementedException("Must override this!!!");
-            }
-        }
-
-        /// <summary>
-        /// Visszadja a megadott szerződést megvalósító Emittert
-        ///  Ha nincs még ilyen akkor létrehozza
-        /// </summary>
-        /// <typeparam name="TContract">Az Emitter által használt szerződés</typeparam>
-        /// <param name="id">az emitter azonosítója</param>
-        /// <returns>Emitter példány</returns>
-        public IEmitter GetEmitter<TContract>(string id) where TContract : BaseContract, new()
-        {
-            KnownContractsWithInfrastucture contract = _knownContracts.FirstOrDefault(x => x.Contract.Id == typeof(TContract).FullName);
-            if (contract == null)
+                {"Message type", msg.MessageType },
+                {"Result type", msg.ReturnType },
+                {"Message content", msg.ConcrateMessage },
+            };
+            VrhLogger.Log("Message receive", logData, null, LogLevel.Debug, this.GetType());
+            Type concrateMessageType = Type.GetType(msg.MessageType);
+            var concrateMessage = JsonConvert.DeserializeObject(msg.ConcrateMessage, concrateMessageType);
+            if (concrateMessageType.IsGenericType && concrateMessageType.GetGenericTypeDefinition() == typeof(Response<>))
             {
-                contract = new KnownContractsWithInfrastucture()
+                string requestId = (string)concrateMessage.GetType()
+                                        .GetProperty("RequestId")
+                                        .GetValue(concrateMessage, null);
+                RegisteredCallWait callWait = null;
+                lock (CallWaits)
                 {
-                    Contract = new TContract(),
-                };
-                _knownContracts.Add(contract);
-            }
-            IEmitter emitter = contract.Emitters.FirstOrDefault(x => x.Id == id);
-            if (emitter == null)
-            {
-                emitter = EmitterFactory(id);
-                contract.Emitters.Add(emitter);
-            }
-            return emitter;           
-        }
-
-        /// <summary>
-        /// Visszadja a megadott szerződést megvalósító Collectort
-        ///  Ha nincs még ilyen akkor létrehozza
-        /// </summary>
-        /// <typeparam name="TContract">A collector által használt szerződés</typeparam>
-        /// <param name="id">A collector azonosítója</param>
-        /// <returns>Collector példány</returns>
-        public ICollector GetCollector<TContract>(string id) where TContract : BaseContract, new()
-        {
-            KnownContractsWithInfrastucture contract = _knownContracts.FirstOrDefault(x => x.Contract.Id == typeof(TContract).FullName);
-            if (contract == null)
-            {
-                contract = new KnownContractsWithInfrastucture()
+                    callWait = CallWaits.FirstOrDefault(x => x.Id == requestId);
+                }
+                if (callWait != null)
                 {
-                    Contract = new TContract(),
-                };
-                _knownContracts.Add(contract);
+                    callWait.Response = concrateMessage;
+                    callWait.WaitResponseSemafor.Set();
+                    logData.Add("Request id", requestId);
+                    VrhLogger.Log("Registered callwait found and signaled successfull.",
+                        logData, null, LogLevel.Verbose, this.GetType());
+                    return;
+                }
             }
-            ICollector collector = contract.Collectors.FirstOrDefault(x => x.Id == id);
-            if (collector == null)
+            HandlerRegister handler = null;
+            lock (Handlers)
             {
-                collector = CollectorFactory(id);
-                contract.Collectors.Add(collector);
+                handler = Handlers.FirstOrDefault(x => x.MessageType.AssemblyQualifiedName == msg.MessageType
+                                                        && x.ReturnType.AssemblyQualifiedName == msg.ReturnType);
             }
-            return collector;
-        }
-
-        /// <summary>
-        /// Az ismert szerződések listája
-        /// </summary>
-        internal List<KnownContractsWithInfrastucture> KnownContracts
-        {
-            get
+            if (handler != null)
             {
-                return _knownContracts;
-            }
-        }
-
-        /// <summary>
-        /// Legyárt egy a csatornának megfelellő emittert
-        /// </summary>
-        /// <param name="id">Az emitter példány azonosítója</param>
-        /// <returns>Emitter példány</returns>
-        protected virtual IEmitter EmitterFactory(string id)
-        {
-            if (this.GetType().FullName == typeof(BaseChannel).FullName)
-            {
-                return new BaseEmitter()
+                logData.Add("Called handler", handler.Handler.Method.Name);
+                if (handler.ReturnType == typeof(void))
                 {
-                    Id = id,
-                };
+                    Task.Run(() => handler.Handler.Method.Invoke(handler.Handler.Target, (new object[] { concrateMessage })));
+                    VrhLogger.Log("Message receive and call handler async succesfull.",
+                        logData, null, LogLevel.Verbose, this.GetType());
+                }
+                else
+                {
+                    try
+                    {
+                        var result = handler.Handler.Method.Invoke(handler.Handler.Target, new object[] { concrateMessage });
+                        Send(new EventHubMessage()
+                        {
+                            ConcrateMessage = JsonConvert.SerializeObject(result),
+                            MessageType = result.GetType().AssemblyQualifiedName,
+                            ReturnType = typeof(void).AssemblyQualifiedName,
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        VrhLogger.Log("Call handler succes, by unwanted exception recieve from handler methode!",
+                            logData, e, LogLevel.Error, this.GetType());
+                    }
+                }
             }
             else
             {
-                throw new NotImplementedException("Must override this!!!");
+                VrhLogger.Log("Message receive but handler not registered in this side of channel!",
+                    logData, null, LogLevel.Debug, this.GetType());
             }
         }
 
         /// <summary>
-        /// Legyárt egy  acsatornának megfelellő collectort
+        /// Csatorna timoutja (konkrét csatorna implementáción ovverride-olható)
         /// </summary>
-        /// <param name="id">A collector példány azonosítója</param>
-        /// <returns>Collector példány</returns>
-        protected virtual ICollector CollectorFactory(string id)
+        /// <returns>timeout</returns>
+        public virtual TimeSpan GetChannelTimout()
         {
-            if (this.GetType().FullName == typeof(BaseChannel).FullName)
-            {
-                return new BaseCollector()
-                {
-                    Id = id,
-                };
-            }
-            else
-            {
-                throw new NotImplementedException("Must override this!!!");
-            }
+            return new TimeSpan(0, 0, 1);
         }
 
         /// <summary>
-        /// A csatorna által ismert szerződések, és azok infrastruktúrája
+        /// Csatorna azonosító
         /// </summary>
-        protected List<KnownContractsWithInfrastucture> _knownContracts = new List<KnownContractsWithInfrastucture>();
+        public string ChannelId { get; set; }
+
+        /// <summary>
+        /// Registrált üzenetkezelők listája
+        ///  Üzenettovábbításhoz innen kell előszedni a handler delegate referenciát, amit hívni kell.
+        ///  A deleget referencia kikeresésének idejére lockkolni kell! (lock(_handlers) { ... }) 
+        /// Alapvetően az EventHub core keret és a BaseChannel kezeli!!!!
+        /// </summary>
+        internal List<HandlerRegister> Handlers { get; } = new List<HandlerRegister>();
+
+        /// <summary>
+        /// Regisztrált visszahívási szemaforok listája
+        /// </summary>
+        internal List<RegisteredCallWait> CallWaits { get; } = new List<RegisteredCallWait>();
+
+        /// <summary>
+        /// A bejövő üzeneteket kezelő metodus referenciája
+        /// </summary>
+        protected Action<EventHubMessage> _coreInputMessageHandler;
+
+        #region IDisposable Support
+        protected bool disposedValue = false; // To detect redundant calls
+
+        /// <summary>
+        /// Leszármazottban felülírandó, és el kell végezni a csatorna specifikus clean-t, 
+        ///     de a base.Dispose()-t mindig meg kell hívni a végén!!!
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                    lock (Handlers)
+                    {
+                        // Üzenetfelkdolgozó kiregisztrálása
+                        _coreInputMessageHandler = null;
+                        // Összes handler eldobása
+                        foreach (var handler in Handlers)
+                        {
+                            handler.Dispose();
+                        }
+                        Handlers.Clear();
+                    }
+                    VrhLogger.Log("Dispose Channel succesfull.",
+                        new Dictionary<string, string>
+                        {
+                            { "Channel id", ChannelId },
+                        },
+                        null,
+                        LogLevel.Verbose,
+                        this.GetType()
+                    );                    
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~BaseChannel() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

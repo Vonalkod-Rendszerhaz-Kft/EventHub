@@ -6,16 +6,17 @@
     <title>Messaging and event forwarding between application modules</title>
     <authors>Görcsös Zoltán</authors>
     <owners>Vonalkód Rendszerház Kft.</owners>
-    <tags>Messaging, Event forwarding, Log4Pro, Inter Application Communication</tags>
+    <tags>EventHub, Messaging, Event forwarding, Log4Pro</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-      v1.0.0-pre-alpha (2017.12.04)
-        This package is pre-alpha!!!
+      v1.0.0 (2018.04.06)
+        Initial 1.0.0 release with documentation.
 
     </releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/vrh-eventhub-core</projectUrl>
+    <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/eventhub.png</iconUrl>
     <dependencies>
       <dependency id="Vrh.Logger" version="1.2.0" />
     </dependencies>

@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Vrh.EventHub.Core")]
-[assembly: AssemblyDescription("Messaging and event forwarding between application modules")]
+[assembly: AssemblyDescription("Type controlled, type safe messaging and event forwarding solution between applications")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Vonalkód Rendszerház Kft.")]
 [assembly: AssemblyProduct("Vrh event hub")]
-[assembly: AssemblyCopyright("Copyright © Vonalkód Rendszerház Kft. 2017")]
+[assembly: AssemblyCopyright("Copyright © Vonalkód Rendszerház Kft. 2017-2018")]
 [assembly: AssemblyTrademark("VRH, Log4Pro")]
 [assembly: AssemblyCulture("")]
 
@@ -34,7 +34,7 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0-pre-alpha2")]
+[assembly: AssemblyInformationalVersion("1.0.0")]
 
 [assembly: InternalsVisibleTo("Vrh.EventHub.Core.Test")]
 

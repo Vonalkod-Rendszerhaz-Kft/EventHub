@@ -1,6 +1,6 @@
 ﻿param($installPath, $toolsPath, $package, $project)
 
-$configItem = $project.ProjectItems.Item("EventHub.Core.Config.xml")
+$configItem = $project.ProjectItems.Item("Vrh.EventHub.Core.Config.xml")
 
 # set 'Copy To Output Directory' to 'Copy if newer'
 $copyToOutput = $configItem.Properties.Item("CopyToOutputDirectory")

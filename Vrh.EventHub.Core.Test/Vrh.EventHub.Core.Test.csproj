@@ -35,9 +35,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="VRH.Common, Version=1.13.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.Common.1.13.0\lib\net35\VRH.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vrh.UnitTest.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.UnitTest.Base.1.0.0\lib\net40\Vrh.UnitTest.Base.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -56,20 +65,12 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="ExceptionTest.cs" />
+    <Compile Include="Exceptions\ExceptionTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="EmitterExceptionsTest.cs" />
-    <Compile Include="ContractExceptionsTest.cs" />
-    <Compile Include="MessageExceptionsTest.cs" />
-    <Compile Include="BaseMessageTest.cs" />
-    <Compile Include="BaseContractTest.cs" />
-    <Compile Include="BaseChannelTest.cs" />
-    <Compile Include="BaseCollectorTest.cs" />
-    <Compile Include="BaseEmitterTest.cs" />
-    <Compile Include="ContractMetaAttributeTest.cs" />
-    <Compile Include="MessageMetaAttributeTest.cs" />
-    <Compile Include="CollectorExceptionsTest.cs" />
     <Compile Include="EventHubTests.cs" />
+    <Compile Include="Interfaces\RequestTest.cs" />
+    <Compile Include="Interfaces\ResponseTest.cs" />
+    <Compile Include="HandlerRegisterTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
@@ -81,9 +82,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.UnitTest.Base\ReadMe.md" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
