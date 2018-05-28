@@ -53,9 +53,8 @@
       <HintPath>..\packages\VRH.Common.1.13.0\lib\net35\VRH.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vrh.EventHub.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.EventHub.Core.1.0.0\lib\net45\Vrh.EventHub.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Vrh.EventHub.Core, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.EventHub.Core.1.1.0\lib\net45\Vrh.EventHub.Core.dll</HintPath>
     </Reference>
     <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.3\lib\net40\Vrh.LinqXMLProcessor.Base.dll</HintPath>

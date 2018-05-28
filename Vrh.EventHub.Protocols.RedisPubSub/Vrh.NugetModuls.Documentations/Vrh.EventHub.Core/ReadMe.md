@@ -1,7 +1,7 @@
 ﻿# Vrh.EventHub.Core
 ![](http://nuget.vonalkod.hu/content/projectavatars/eventhub.png)
 
-*Ez a leírás a komponens **v1.0.0** kiadásáig bezáróan naprakész.
+*Ez a leírás a komponens **1.1.0** kiadásáig bezáróan naprakész.
 Igényelt minimális framework verzió: **4.5**
 Teljes funkcionalitás és hatékonyság kihasználásához szükséges legalacsonyabb framework verzió: **4.5***
 
@@ -189,7 +189,19 @@ catch(Exception e)
 return response;
 ```
 
+#### Csatorna inicializáció
 
+Az **EventHubCore** stattikus típus tartalmaz egy **InitielizeChannel** metódust, segítségével egy adott csatorna példányt inicializálni lehet abban az EventHub végpontban, ahol a hívás történik.
+Bár az EventHub nem igényel csatorna inicializációt, de bizonyos esetekben ennek használata indokolt lehet.
+* Nem akarjuk, hogy az első híváés késleltetést szenvedjen a működési logikában, azáltal, hogy a csatorna infrastruktúra inicializációja ráterhelődik.
+* Erősen túlterhelt párhuzamos környezetben a csatornainicializáció kiemelése a indokolt lehet, az inicializáció garantált és hibamentes megtörténtéhez. Ilyen például aRedis pub/sub csatorna megvalósítás.
+
+Az inicializációt **InitielizeChannel** mindig szinkron végezzük, garantáljuk, hoyga a hívás soha ne kerüljön ThreadPool-ba!
+
+Használati mintája:
+```csharp
+EventHubCore.InitielizeChannel<RedisPubSubChannel>("sampleservice");
+```
 
 #### Üzenetek küldése
 
@@ -267,6 +279,8 @@ catch(Exception e)
 }
 
 ```
+
+> **Soha ne dobjuk a Call hívást threadpoolba (pl. Task használatával)! Amennyiben mégis szükség lenne ilyenre, akkor TaskFactory-t kell használni, és kötelezően megadandó a TaskCreationOptions paramétert LongRunning-ra kell állítani! Ellenkező esetben az EventHubCore nem tudja garantálni, hogy az adott csatorna működése a Call hívások tekintetében hibamenetes lesz!**
 
 ##### Send
 A **Send** olyan üzenetek elküldésére szolgál, amelyek feldolgozásának eredményéről nem várunk választ. Vagy legalábbis nem a küldés helyén várjuk azt (aszinkron logikák). A Send hívása a hívó kód oldalán szinkron történik, a hívó hely az üzenet kommunikációs csatornába továbbításának idejére blokkolódik, és ennek megfelelően hibajelzés az infrastruktúra működőképességéről van csak. Ha az üzenet kommunikációs csatornába küldése sikeres, akkor sem annak a fogadó oldali kivételéről, sem feldolgozásáról semmilyen módon nem jut vissza a hívó helyre információ.
@@ -1263,6 +1277,9 @@ Handler bejegyzési költségek üzenetfogadó végpontban:
 <hr></hr>
 
 ## Version History:
+### v1.1.0 (2018.05.28)
+* InitielizeChannel API hívás bevezetése
+
 ### v1.0.0 (2018.04.06)
 * Initial release with documentation
 
