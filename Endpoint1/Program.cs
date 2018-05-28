@@ -11,9 +11,45 @@ namespace Endpoint1
 {
     class Program
     {
+        static AutoResetEvent _waitForTestRuns = new AutoResetEvent(false);
+
+
+        static private int _round = 0;
+
+        static private int _testruns = 0;
+
+        static object _staticlocker = new object();
+
         static void Main(string[] args)
         {
-            string exit = String.Empty;            
+            EventHubCore.InitielizeChannel<RedisPubSubChannel>(TestConctract.CHANNEL_ID);
+            do
+            {
+                //Console.Clear();
+                Console.WriteLine("Number of test runs (leave empty for exit):");
+                string strNum = Console.ReadLine();
+                if (String.IsNullOrEmpty(strNum))
+                {
+                    return;
+                }
+                else
+                {
+                    int.TryParse(strNum, out _testruns);
+                }
+                _round = 0;
+                for (int i = 0; i < _testruns; i++)
+                {
+                    Task.Factory.StartNew(() => RunTest(), TaskCreationOptions.LongRunning);
+                }
+                _waitForTestRuns.WaitOne();
+                Console.WriteLine($"All tests {_testruns} passed");
+                Console.WriteLine($"Press a key for new round!");
+                Console.ReadKey();
+                _round = 0;
+                _testruns = 0;
+            } while (true);
+
+            string exit = String.Empty;
             while (exit != "e")
             {
                 Warmup();
@@ -25,6 +61,40 @@ namespace Endpoint1
                 FullAsyncCallThroughputWithEndSignal();
                 exit = Console.ReadLine();
                 Write("");
+            }
+        }
+
+        async static void RunTest()
+        {
+            lock (_staticlocker)
+            {
+                Console.WriteLine($"rounds: { _round }");
+                var twoNumber = new TestConctract.TwoNumber
+                {
+                    One = 1,
+                    Two = 1,
+                    Count = _testruns,
+                    No = _round,
+                };
+                try
+                {
+                    lock (_staticlocker)
+                    {
+                        Console.WriteLine($"CALL:............{twoNumber.No}");
+                        var result = EventHubCore.Call<RedisPubSubChannel,
+                            TestConctract.TwoNumber,
+                            TestConctract.Result>(TestConctract.CHANNEL_ID, twoNumber, new TimeSpan(0, 0, 2));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!{ex.Message}");
+                }
+                _round++;
+                if (_round == _testruns)
+                {
+                    _waitForTestRuns.Set();
+                }
             }
         }
 
@@ -137,7 +207,7 @@ namespace Endpoint1
 
         private static void AsyncTestMessageSender(TestConctract.TestMessage message)
         {
-            Task.Run(() => 
+            Task.Run(() =>
                 {
                     EventHubCore.Send<RedisPubSubChannel, TestConctract.TestMessage>(TestConctract.CHANNEL_ID, message);
                 });
@@ -149,7 +219,7 @@ namespace Endpoint1
 
         private static void AllOk(TestConctract.AllOk obj)
         {
-            WaitAllReceiveSemafor.Set();   
+            WaitAllReceiveSemafor.Set();
         }
 
         private static void NonBlockWrite(string line)
@@ -163,7 +233,7 @@ namespace Endpoint1
 
         private static void Write(string line)
         {
-            lock(_consoleLocker)
+            lock (_consoleLocker)
             {
                 Console.WriteLine(line);
             }

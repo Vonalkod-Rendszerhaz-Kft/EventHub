@@ -57,10 +57,11 @@ namespace Endpoint2
 
         public static Response<TestConctract.Result> Add(Request<TestConctract.TwoNumber, TestConctract.Result> request)
         {
+            Console.WriteLine($"CALL................. {request.Id}");
             var myResponse = request.MyResponse;
             var input = request.RequestContent;
             myResponse.ResponseContent = new TestConctract.Result { Count = input.Count, No = input.No, ResultValue = input.One + input.Two };
-            NonBlockWrite($"Receive: { input.No }");
+            //NonBlockWrite($"Receive: { input.No }");
             return myResponse;
         }
 
@@ -87,7 +88,7 @@ namespace Endpoint2
             // Teljesítmény mérésnél vedd ki kommentből a returnt, 
             //  hogy ne mérd bele a szinkronizált Console.Write-ok költségét
             // Ha a közbeni müködés részleteit is látni akarod consolüzenetekben, akkor commentezd a returnt.
-            return;           
+            //return;           
             Task.Run(() => Write(line));
         }
 

@@ -18,10 +18,10 @@ namespace EventhubUseSamples
             //amc.TestAsyncSend();
             //Thread.Sleep(1000);
             //Console.WriteLine("");
-            //amc.TestSyncCall();
+            amc.TestSyncCall();
             //Thread.Sleep(1000);
             //Console.WriteLine("");
-            amc.TestAsyncSendWithResultHandling();
+            //amc.TestAsyncSendWithResultHandling();
             Console.ReadLine();
         }
 
