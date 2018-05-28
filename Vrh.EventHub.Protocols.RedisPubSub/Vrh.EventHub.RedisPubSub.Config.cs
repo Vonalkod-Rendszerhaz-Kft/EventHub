@@ -20,16 +20,16 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
         /// <summary>
         /// A modul által használt redis connection alias
         /// </summary>
-        internal string RedisConnectionAlias
+        internal string RedisConnection
         {
             get
             {
-                string alias = ConfigurationManager.AppSettings[RedisPubSubChannel.MODUL_PREFIX + ":" + Me.RedisConnectionAliasElement.NAME];
-                if (String.IsNullOrEmpty(alias))
+                string redisConnection = ConfigurationManager.AppSettings[RedisPubSubChannel.MODUL_PREFIX + ":" + Me.RedisConnectionAliasElement.NAME];
+                if (String.IsNullOrEmpty(redisConnection))
                 {
-                    alias = GetElementValue(GetXElement(Me.RedisConnectionAliasElement.NAME), "redis");
+                    redisConnection = GetElementValue(GetXElement(Me.RedisConnectionAliasElement.NAME), "localhost");
                 }
-                return alias;
+                return redisConnection;
             }
         }
 
@@ -67,7 +67,7 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
                 /// <summary>
                 /// A használt redis connection alias: Az XML tag neve 
                 /// </summary>
-                internal const string NAME = "RedisConnectionAlias";
+                internal const string NAME = "RedisConnection";
             }
             /// <summary>
             /// A csatornán konfigurált timeout

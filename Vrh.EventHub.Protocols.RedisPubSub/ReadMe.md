@@ -2,7 +2,7 @@
  
  ![](http://nuget.vonalkod.hu/content/projectavatars/eventhubredispubsub.png)
  
-Ez a leírás a komponens **v1.0.0** kiadásáig bezáróan naprakész.
+Ez a leírás a komponens **2.0.0** kiadásáig bezáróan naprakész.
 Igényelt minimális framework verzió: **4.5**
 Teljes funkcionalitás és hatékonyság kihasználásához szükséges legalacsonyabb framework verzió: **4.5**
 
@@ -53,11 +53,11 @@ Ahol az érték egy érvényes TimeSpan string lehet HH:MM:SS.ZZZ formában, aho
 
 definiál. (Tehát fenti érték 1 tizedmásodperces timeout-ot jelent.)
 
-#### Vrh.EventHub.RedisPubSub:RedisConnectionAlias
+#### Vrh.EventHub.RedisPubSub:RedisConnection
 Definiélja az EventHub végpont által használt Redis Connection aliast, mint **Vrh.Redis.ConnectionStore** szerinti absztrakciót.
 ```xml
 <appSettings>      
-  <add key="Vrh.EventHub.RedisPubSub:RedisConnectionAlias"
+  <add key="Vrh.EventHub.RedisPubSub:RedisConnection"
         value="EventhubRedisInfrastructure" />
 </appSettings>
 ```
@@ -68,7 +68,7 @@ Ha a beállításokat nem app settings kulcsként adjuk meg, akkor lehetőségü
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <Vrh.EventHub.RedisPubSub>
-  <RedisConnectionAlias>redis</RedisConnectionAlias>
+  <RedisConnection>redis</RedisConnection>
   <ChannelTimeout>00:00:00.1</ChannelTimeout>
 </Vrh.EventHub.RedisPubSub>
 ```
@@ -89,12 +89,16 @@ Ahol:
 <hr></hr>
 
 ## Version History:
+### 2.0.0 (2018.05.28)
+Incopatibility API Changes:
+1. Vrh.Redis.ConnectionStore remove (revert to static lazy base ConnectionMultiplexer share sample)
+2. Configuration XML: RedisConnectionAlias XML tag rename to RedisConnection
 
-### v1.0.0 (2018.04.06)
+### 1.0.0 (2018.04.06)
 * Initial release with documentation
 
-## v1.0.0-prerelease (2018.03.26)
+## 1.0.0-prerelease (2018.03.26)
 * Initial prerelease without documentation
 
-## v1.0.0-pre-alpha (2017.12.04)
+## 1.0.0-pre-alpha (2017.12.04)
 * Prototype version

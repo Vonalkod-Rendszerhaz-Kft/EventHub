@@ -65,10 +65,6 @@
       <HintPath>..\packages\Vrh.Logger.1.4.0\lib\net45\Vrh.Logger.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vrh.Redis.ConnectionStore, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.Redis.ConnectionStore.1.0.0\lib\net45\Vrh.Redis.ConnectionStore.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -85,7 +81,6 @@
     <None Include="Vrh.NugetModuls.Documentations\Vrh.EventHub.Core\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.LinqXMLProcessor.Base\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />
-    <None Include="Vrh.NugetModuls.Documentations\Vrh.Redis.ConnectionStore\ReadMe.md" />
     <None Include="_CreateNewNuGetPackage\Config.ps1" />
     <None Include="_CreateNewNuGetPackage\DoNotModify\CreateNuGetPackage.ps1" />
     <None Include="_CreateNewNuGetPackage\DoNotModify\New-NuGetPackage.ps1" />
@@ -116,6 +111,11 @@ REM If you see this in Visual Studio's Error List window, check the Output windo
 ECHO Creating NuGet package in Post-Build event...
 PowerShell -NoProfile -ExecutionPolicy Bypass -Command "&amp; '$(ProjectDir)_CreateNewNuGetPackage\DoNotModify\CreateNuGetPackage.ps1' -ProjectFilePath '$(ProjectPath)' -OutputDirectory '$(TargetDir)' -BuildConfiguration '$(ConfigurationName)' -BuildPlatform '$(PlatformName)' -Verbose"</PostBuildEvent>
   </PropertyGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties Viade-Afterburner-Debug="DisposeMonitoring=True|DeadlockDetection=True|DeadlockPrediction=True|ThreadsMap=True" />
+    </VisualStudio>
+  </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

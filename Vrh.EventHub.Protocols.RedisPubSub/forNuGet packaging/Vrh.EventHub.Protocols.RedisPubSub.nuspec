@@ -11,9 +11,9 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-      v1.0.0 (2018.04.06)
-        Initial 1.0.0 release with documentation. 
-
+      2.0.0 (2018.05.28)
+        1. Vrh.Redis.ConnectionStore remove (revert to static lazy base ConnectionMultiplexer share sample)
+        2. Configuration XML: RedisConnectionAlias XML tag rename to RedisConnection
     </releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/redispubsub</projectUrl>
     <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/eventhubredispubsub.png</iconUrl>

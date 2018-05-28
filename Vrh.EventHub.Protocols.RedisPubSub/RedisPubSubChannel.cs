@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Vrh.EventHub.Core;
 using StackExchange.Redis;
-using Vrh.Redis.ConnectionStore;
 using Newtonsoft.Json;
 using System.Configuration;
 using Vrh.Logger;
@@ -16,6 +15,11 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
     /// </summary>
     public class RedisPubSubChannel : BaseChannel
     {
+        static bool RedisPubSubChannelConnected()
+        {
+            return Connection.IsConnected;            
+        }
+
         /// <summary>
         /// Send (Aszinkron) üzenetküldés csatornaimplementáció
         /// </summary>
@@ -25,12 +29,26 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
             PubSub.Publish(ChannelId, JsonConvert.SerializeObject(message));
         }
 
+        private static Lazy<ConnectionMultiplexer> lazyConnection = new Lazy<ConnectionMultiplexer>(() => {
+            var configfile = new EventHubRedisPubSubConfig(GetConfigFile());
+            return ConnectionMultiplexer.Connect(configfile.RedisConnection);
+        });
+
+        public static ConnectionMultiplexer Connection
+        {
+            get
+            {
+                return lazyConnection.Value;
+            }
+        }
+
         /// <summary>
         /// Inicializálja a csatorna infrastruktúráját
         /// </summary>
         public override void InitializeChannelInfrastructure()
         {
-            PubSub.Subscribe(ChannelId, HandleInputMessages);
+            RedisPubSubChannelConnected();
+            PubSub.Subscribe(ChannelId, HandleInputMessages, CommandFlags.HighPriority);
             base.InitializeChannelInfrastructure();
         }
 
@@ -52,9 +70,8 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
         /// <param name="message">Érkezett üzenet (json serializált )</param>
         private void HandleInputMessages(RedisChannel channel, RedisValue message)
         {
-            // csak átpaszolja (aszinkron) az érkező üzenetet a Core-nak
-            EventHubMessage msg = JsonConvert.DeserializeObject<EventHubMessage>(message);           
-            Task.Run(() => _coreInputMessageHandler.DynamicInvoke(new object[] { msg }));
+            EventHubMessage msg = JsonConvert.DeserializeObject<EventHubMessage>(message);
+            _coreInputMessageHandler.DynamicInvoke(new object[] { msg });
         }
 
         /// <summary>
@@ -98,7 +115,7 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
                 {
                     if (_pubsub == null)
                     {
-                        var cm = RedisConnectionStore.GetConnection(Configuration.RedisConnectionAlias);
+                        var cm = Connection;
                         _pubsub = cm.GetSubscriber();
                     }
                     return _pubsub;
@@ -133,11 +150,7 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
         {
             get
             {
-                string config = ConfigurationManager.AppSettings[$"{MODUL_PREFIX}:Config"];
-                if (String.IsNullOrEmpty(config))
-                {
-                    config = "Vrh.EventHub.RedisPubSub.Config.xml/Vrh.EventHub.RedisPubSub";
-                }
+                string config = GetConfigFile();
                 VrhLogger.Log(
                     $"Used EventHub.RedisPubSub channel configuration: {config}",
                     new Dictionary<string, string>()
@@ -150,6 +163,16 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
                     this.GetType());
                 return config;
             }
+        }
+
+        private static string GetConfigFile()
+        {
+            string config = ConfigurationManager.AppSettings[$"{MODUL_PREFIX}:Config"];
+            if (String.IsNullOrEmpty(config))
+            {
+                config = "Vrh.EventHub.RedisPubSub.Config.xml/Vrh.EventHub.RedisPubSub";
+            }
+            return config;
         }
 
         #region IDisposable Support
