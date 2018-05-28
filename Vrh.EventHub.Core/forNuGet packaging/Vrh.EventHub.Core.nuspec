@@ -11,8 +11,8 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-      v1.0.0 (2018.04.06)
-        Initial 1.0.0 release with documentation.
+      v1.1.0 (2018.05.28)
+      - Api expension with: InitielizeChannel
 
     </releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/vrh-eventhub-core</projectUrl>

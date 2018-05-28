@@ -31,6 +31,23 @@ namespace Vrh.EventHub.Core
         }
 
         /// <summary>
+        /// Inicializálja a megadott csatornát
+        ///     Segítségével kiemelhető a csatorna infrastruktúra kreállási költslége ami így:
+        ///         - nem az első tényleges művekletet fogja terhelni
+        ///         - Redukáklja az erősen túlterhelt párhuzamos környezetben való működést terhelő problémákat 
+        ///             (mint pl. a redis pub/sub feliratkozásoknál feléppő timeoutok) 
+        /// </summary>
+        /// <typeparam name="TChannel">A csatorna típusa</typeparam>
+        /// <param name="channelId">csatorna azonosító</param>
+        public static void InitielizeChannel<TChannel>(string channelId)
+            where TChannel : BaseChannel, new()
+        {
+            var registeredChannel =
+                _channels.FirstOrDefault(x => x.Id == channelId && x.Channel.GetType() == typeof(TChannel))
+                ?? RegisterChannel<TChannel>(channelId);
+        }
+
+        /// <summary>
         /// Aszinkron üzenetküldés!
         ///     Olyan üzenetek elküldésére használandó, amelyre a küldő oldal semmiylen módon nem vár választ. 
         /// A küldés során keletkező exceptiön-ök (Pl. közvetitő infrastruktúra hibái) felmennek a hívási helyre. 
@@ -119,8 +136,8 @@ namespace Vrh.EventHub.Core
             {
                 RequestContent = request,
             };
-            var registeredChannel = 
-                _channels.FirstOrDefault(x => x.Id == channelId && x.Channel.GetType() == typeof(TChannel)) 
+            var registeredChannel =
+                _channels.FirstOrDefault(x => x.Id == channelId && x.Channel.GetType() == typeof(TChannel))
                 ?? RegisterChannel<TChannel>(channelId);
             if (!timeOut.HasValue || timeOut.Value.TotalMilliseconds == 0)
             {
@@ -175,8 +192,8 @@ namespace Vrh.EventHub.Core
                             {"Channel id", channelId},
                             {"Request", JsonConvert.SerializeObject(requestMessage) },
                     },
-                    e, 
-                    LogLevel.Fatal, 
+                    e,
+                    LogLevel.Fatal,
                     typeof(EventHubCore));
                 throw e;
             }
@@ -390,7 +407,7 @@ namespace Vrh.EventHub.Core
                 {
                     registeredChannel.Channel.Send(eventHubMessage);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     throw new FatalEventHubException($"Channel Send Error in {registeredChannel.Id} (type: {registeredChannel.Channel.GetType().FullName}) channel!", e);
                 }
@@ -414,7 +431,7 @@ namespace Vrh.EventHub.Core
         {
             var channel = ChannelRegister.CreateChannel<TChannel>(channelId);
             lock (_channels)
-            {                
+            {
                 _channels.Add(channel);
             }
             VrhLogger.Log("Register EventHub channel is success!",
@@ -442,13 +459,13 @@ namespace Vrh.EventHub.Core
             HandlerRegister existingHandlerRegister = null;
             lock (registeredChannel.Channel.Handlers)
             {
-                existingHandlerRegister = 
-                    registeredChannel.Channel.Handlers.FirstOrDefault(x => x.MessageType == handlerRegister.MessageType 
+                existingHandlerRegister =
+                    registeredChannel.Channel.Handlers.FirstOrDefault(x => x.MessageType == handlerRegister.MessageType
                                                                             && x.ReturnType == handlerRegister.ReturnType);
                 if (existingHandlerRegister != null)
                 {
                     existingHandlerRegister.Dispose();
-                    registeredChannel.Channel.Handlers.Remove(existingHandlerRegister);                    
+                    registeredChannel.Channel.Handlers.Remove(existingHandlerRegister);
                 }
                 registeredChannel.Channel.Handlers.Add(handlerRegister);
             }
