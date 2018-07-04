@@ -68,7 +68,7 @@ namespace Vrh.EventHub.Core
                 if (callWait != null)
                 {
                     callWait.Response = concrateMessage;
-                    callWait.WaitResponseSemafor.Set();
+                    callWait.WaitResponseSemaforSlim.Release();
                     logData.Add("Request id", requestId);
                     VrhLogger.Log("Registered callwait found and signaled successfull.",
                         logData, null, LogLevel.Verbose, this.GetType());
@@ -86,7 +86,7 @@ namespace Vrh.EventHub.Core
                 logData.Add("Called handler", handler.Handler.Method.Name);
                 if (handler.ReturnType == typeof(void))
                 {
-                    Task.Run(() => handler.Handler.Method.Invoke(handler.Handler.Target, (new object[] { concrateMessage })));
+                    handler.Handler.Method.Invoke(handler.Handler.Target, (new object[] { concrateMessage }));
                     VrhLogger.Log("Message receive and call handler async succesfull.",
                         logData, null, LogLevel.Verbose, this.GetType());
                 }

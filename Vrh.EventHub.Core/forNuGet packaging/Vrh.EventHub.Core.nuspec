@@ -11,9 +11,11 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-      v1.1.0 (2018.05.28)
-      - Api expension with: InitielizeChannel
-
+      v1.1.1 (2018.07.04)
+      - Call (szinkron) hívások egy aszinkron metódusba terelve, hogy a SemaphoreSlim async waitje legyen használható (await)
+      - Refactoring result object beszerzés
+      - AutoReset Event kicserélve SemaphoreSlim-re a RegisteredCallWait objektumokban, hogy taskpool-ban is megfelelően működjön
+      - Methode Invoke nem taskalapú a handlerhívásokban
     </releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/vrh-eventhub-core</projectUrl>
     <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/eventhub.png</iconUrl>

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Vrh.Logger;
 using VRH.Common;
@@ -132,10 +133,6 @@ namespace Vrh.EventHub.Core
             where TResponse : new()
             where TChannel : BaseChannel, new()
         {
-            Request<TRequest, TResponse> requestMessage = new Request<TRequest, TResponse>
-            {
-                RequestContent = request,
-            };
             var registeredChannel =
                 _channels.FirstOrDefault(x => x.Id == channelId && x.Channel.GetType() == typeof(TChannel))
                 ?? RegisterChannel<TChannel>(channelId);
@@ -147,7 +144,34 @@ namespace Vrh.EventHub.Core
                     timeOut = new TimeSpan(0, 0, 1);
                 }
             }
+            Request<TRequest, TResponse> requestMessage = new Request<TRequest, TResponse>
+            {
+                RequestContent = request,
+            };
             var callWait = new RegisteredCallWait { Id = requestMessage.Id };
+            var t = Task.Run(async () => await SafeCall<TChannel, TRequest, TResponse>(registeredChannel, callWait, requestMessage, timeOut));            
+            t.Wait();
+            var responseMessage = (Response<TResponse>)callWait.Response;
+            if (!responseMessage.Ok)
+            {
+                throw responseMessage.Exception;
+            }
+            VrhLogger.Log("EventHub Call success.",
+                new Dictionary<string, string>()
+                {
+                    {"Channel id", registeredChannel.Id},
+                    {"Request", JsonConvert.SerializeObject(requestMessage) },
+                    {"Response", JsonConvert.SerializeObject(responseMessage) },
+                },
+                null, LogLevel.Verbose, typeof(EventHubCore));
+            return responseMessage.ResponseContent;
+        }
+
+        private static async Task SafeCall<TChannel, TRequest, TResponse>(ChannelRegister registeredChannel, RegisteredCallWait callWait, Request<TRequest, TResponse> requestMessage, TimeSpan? timeOut = null)
+            where TRequest : new()
+            where TResponse : new()
+            where TChannel : BaseChannel, new()
+        {
             lock (registeredChannel.Channel.CallWaits)
             {
                 registeredChannel.Channel.CallWaits.Add(callWait);
@@ -155,26 +179,15 @@ namespace Vrh.EventHub.Core
             try
             {
                 try
-                {
-                    Send<TChannel, TRequest, TResponse>(channelId, requestMessage);
-                    if (!callWait.WaitResponseSemafor.WaitOne(timeOut.Value))
+                {                    
+                    Send<TChannel, TRequest, TResponse>(registeredChannel.Id, requestMessage);
+                    if (!(await callWait.WaitResponseSemaforSlim.WaitAsync(timeOut.Value)))
                     {
-                        throw new FatalEventHubException("Call Request Timout occured!");
-                    }
-                    var responseMessage = (Response<TResponse>)callWait.Response;
-                    if (!responseMessage.Ok)
-                    {
-                        throw responseMessage.Exception;
-                    }
-                    VrhLogger.Log("EventHub Call success.",
-                        new Dictionary<string, string>()
+                        callWait.Response = new Response<TResponse>()
                         {
-                            {"Channel id", channelId},
-                            {"Request", JsonConvert.SerializeObject(requestMessage) },
-                            {"Response", JsonConvert.SerializeObject(responseMessage) },
-                        },
-                        null, LogLevel.Verbose, typeof(EventHubCore));
-                    return responseMessage.ResponseContent;
+                            Exception = new FatalEventHubException("Call Request Timout occured!")
+                        };
+                    }
                 }
                 finally
                 {
@@ -189,7 +202,7 @@ namespace Vrh.EventHub.Core
                 VrhLogger.Log("EventHub Call Error!",
                     new Dictionary<string, string>()
                     {
-                            {"Channel id", channelId},
+                            {"Channel id", registeredChannel.Id},
                             {"Request", JsonConvert.SerializeObject(requestMessage) },
                     },
                     e,

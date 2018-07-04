@@ -6,6 +6,7 @@ using StackExchange.Redis;
 using Newtonsoft.Json;
 using System.Configuration;
 using Vrh.Logger;
+using System.Threading;
 
 namespace Vrh.EventHub.Protocols.RedisPubSub
 {
@@ -26,7 +27,11 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
         /// <param name="message">Elküldendő üzenet</param>
         public override void Send(EventHubMessage message)
         {
-            PubSub.Publish(ChannelId, JsonConvert.SerializeObject(message));
+            var th = new Thread(() => PubSub.Publish(ChannelId, JsonConvert.SerializeObject(message), CommandFlags.HighPriority));
+            th.Name = "SendThread";
+            th.Priority = ThreadPriority.Highest;
+            th.IsBackground = true;
+            th.Start();
         }
 
         private static Lazy<ConnectionMultiplexer> lazyConnection = new Lazy<ConnectionMultiplexer>(() => {
@@ -71,7 +76,11 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
         private void HandleInputMessages(RedisChannel channel, RedisValue message)
         {
             EventHubMessage msg = JsonConvert.DeserializeObject<EventHubMessage>(message);
-            _coreInputMessageHandler.DynamicInvoke(new object[] { msg });
+            var th = new Thread(() => _coreInputMessageHandler.Invoke(msg));
+            th.Name = "HandleInputMessage Thread";
+            th.Priority = ThreadPriority.Highest;
+            th.IsBackground = true;
+            th.Start();
         }
 
         /// <summary>

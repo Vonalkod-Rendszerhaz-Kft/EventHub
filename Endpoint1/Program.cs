@@ -23,31 +23,34 @@ namespace Endpoint1
         static void Main(string[] args)
         {
             EventHubCore.InitielizeChannel<RedisPubSubChannel>(TestConctract.CHANNEL_ID);
-            do
-            {
-                //Console.Clear();
-                Console.WriteLine("Number of test runs (leave empty for exit):");
-                string strNum = Console.ReadLine();
-                if (String.IsNullOrEmpty(strNum))
-                {
-                    return;
-                }
-                else
-                {
-                    int.TryParse(strNum, out _testruns);
-                }
-                _round = 0;
-                for (int i = 0; i < _testruns; i++)
-                {
-                    Task.Factory.StartNew(() => RunTest(), TaskCreationOptions.LongRunning);
-                }
-                _waitForTestRuns.WaitOne();
-                Console.WriteLine($"All tests {_testruns} passed");
-                Console.WriteLine($"Press a key for new round!");
-                Console.ReadKey();
-                _round = 0;
-                _testruns = 0;
-            } while (true);
+            //do
+            //{
+            //    //Console.Clear();
+            //    Console.WriteLine("Number of test runs (leave empty for exit):");
+            //    string strNum = Console.ReadLine();
+            //    if (String.IsNullOrEmpty(strNum))
+            //    {
+            //        return;
+            //    }
+            //    else
+            //    {
+            //        int.TryParse(strNum, out _testruns);
+            //    }
+            //    _round = 0;
+            //    for (int i = 0; i < _testruns; i++)
+            //    {
+            //        //Task.Factory.StartNew(() => RunTest(), TaskCreationOptions.LongRunning);
+            //        Task.Run(() => RunTest());
+            //        //RunTest();
+            //        //TaskScheduler.Current.
+            //    }
+            //    _waitForTestRuns.WaitOne();
+            //    Console.WriteLine($"All tests {_testruns} passed");
+            //    Console.WriteLine($"Press a key for new round!");
+            //    Console.ReadKey();
+            //    _round = 0;
+            //    _testruns = 0;
+            //} while (true);
 
             string exit = String.Empty;
             while (exit != "e")
@@ -66,7 +69,8 @@ namespace Endpoint1
 
         async static void RunTest()
         {
-            lock (_staticlocker)
+            await semaphoreSlim.WaitAsync();
+            try
             {
                 Console.WriteLine($"rounds: { _round }");
                 var twoNumber = new TestConctract.TwoNumber
@@ -78,13 +82,11 @@ namespace Endpoint1
                 };
                 try
                 {
-                    lock (_staticlocker)
-                    {
-                        Console.WriteLine($"CALL:............{twoNumber.No}");
-                        var result = EventHubCore.Call<RedisPubSubChannel,
-                            TestConctract.TwoNumber,
-                            TestConctract.Result>(TestConctract.CHANNEL_ID, twoNumber, new TimeSpan(0, 0, 2));
-                    }
+                    Console.WriteLine($"CALL:............{twoNumber.No}");
+                    var result = EventHubCore.Call<RedisPubSubChannel,
+                        TestConctract.TwoNumber,
+                        TestConctract.Result>(TestConctract.CHANNEL_ID, twoNumber, new TimeSpan(0, 0, 10));
+                    Console.WriteLine($"RESPONSE:............{result.No}");
                 }
                 catch (Exception ex)
                 {
@@ -96,7 +98,13 @@ namespace Endpoint1
                     _waitForTestRuns.Set();
                 }
             }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
         }
+
+        private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
         public static void Warmup()
         {
@@ -132,7 +140,7 @@ namespace Endpoint1
                 };
                 var result = EventHubCore.Call<RedisPubSubChannel,
                     TestConctract.TwoNumber,
-                    TestConctract.Result>(TestConctract.CHANNEL_ID, twoNumber);
+                    TestConctract.Result>(TestConctract.CHANNEL_ID, twoNumber, new TimeSpan(0, 0, 10));
                 NonBlockWrite($"send: { twoNumber.One } + { twoNumber.Two }; receive: { result.ResultValue }");
             }
             DateTime endTime = DateTime.UtcNow;
@@ -273,6 +281,6 @@ namespace Endpoint1
 
         public const string CHANNEL_ID = "test";
 
-        public const int TEST_ROUNDS = 100000;
+        public const int TEST_ROUNDS = 10000;
     }
 }

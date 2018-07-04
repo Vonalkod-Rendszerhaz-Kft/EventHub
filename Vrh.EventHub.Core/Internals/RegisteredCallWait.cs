@@ -14,13 +14,13 @@ namespace Vrh.EventHub.Core
         public string Id { get; set; }
 
         /// <summary>
-        /// Semafor, melyet signálni kell hogy a küldő processz várakozása megszakadjon, és kivegye majd visszadja a kapott választ
-        /// </summary>
-        public AutoResetEvent WaitResponseSemafor { get; } = new AutoResetEvent(false);
-
-        /// <summary>
         /// Ide kell elhelyezni a kapott választ (A semafor signálása előtt!)
         /// </summary>
-        public Object Response { get; set; }
+        public object Response { get; set; }
+
+        /// <summary>
+        /// Semafor, melyet signálni kell hogy a küldő processz várakozása megszakadjon, és kivegye majd visszadja a kapott választ
+        /// </summary>
+        public SemaphoreSlim WaitResponseSemaforSlim { get; } = new SemaphoreSlim(0);
     }
 }

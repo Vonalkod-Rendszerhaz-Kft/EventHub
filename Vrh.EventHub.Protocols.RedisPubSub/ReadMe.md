@@ -89,6 +89,9 @@ Ahol:
 <hr></hr>
 
 ## Version History:
+### 2.0.1 (2018.07.04)
+Patches:
+1. Redis küldés és fogadás áttéve önáló szállra (taskpool környezetben való jobb teljesítményért)
 ### 2.0.0 (2018.05.28)
 Incopatibility API Changes:
 1. Vrh.Redis.ConnectionStore remove (revert to static lazy base ConnectionMultiplexer share sample)
