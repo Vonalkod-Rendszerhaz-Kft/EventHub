@@ -89,6 +89,10 @@ Ahol:
 <hr></hr>
 
 ## Version History:
+### 2.0.2 (2018.07.23)
+Patches:
+1. Core patch (1.1.2) életbe léptetése (csommag függőség az EventHub.Core 1.1.2-re emelve)
+
 ### 2.0.1 (2018.07.04)
 Patches:
 1. Redis küldés és fogadás áttéve önáló szállra (taskpool környezetben való jobb teljesítményért)

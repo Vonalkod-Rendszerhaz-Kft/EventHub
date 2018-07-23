@@ -1277,7 +1277,19 @@ Handler bejegyzési költségek üzenetfogadó végpontban:
 <hr></hr>
 
 ## Version History:
+### 1.1.2 (2019.07.23)
+Patches:
+* Annak a javítása, hogy a DropHandler nem működik Call típusú eseménykezelők kiregisztrálásához
+
+### v1.1.1 (2018.07.04)
+Patches:
+* Call (szinkron) hívások egy aszinkron metódusba terelve, hogy a SemaphoreSlim async waitje legyen használható (await)
+* Refactoring result object beszerzés
+* AutoReset Event kicserélve SemaphoreSlim-re a RegisteredCallWait objektumokban, hogy taskpool-ban is megfelelően működjön
+* Methode Invoke nem taskalapú a handlerhívásokban
+
 ### v1.1.0 (2018.05.28)
+Compatibility API changes:
 * InitielizeChannel API hívás bevezetése
 
 ### v1.0.0 (2018.04.06)
