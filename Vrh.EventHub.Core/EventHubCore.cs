@@ -322,7 +322,7 @@ namespace Vrh.EventHub.Core
             where TResponse : new()
             where TChannel : BaseChannel, new()
         {
-            RegisterHandler<TChannel>(channelId, HandlerRegister.RegistHandler(handler));
+            DropHandler<TChannel>(channelId, HandlerRegister.RegistHandler(handler));
         }
 
         /// <summary>
@@ -339,7 +339,7 @@ namespace Vrh.EventHub.Core
             where TResponse : new()
             where TChannel : BaseChannel, new()
         {
-            RegisterHandler<TChannel>(channelId, HandlerRegister.RegistHandler(handler));
+            DropHandler<TChannel>(channelId, HandlerRegister.RegistHandler(handler));
         }
 
         /// <summary>
