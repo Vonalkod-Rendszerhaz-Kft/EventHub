@@ -1277,7 +1277,10 @@ Handler bejegyzési költségek üzenetfogadó végpontban:
 <hr></hr>
 
 ## Version History:
-### 1.1.2 (2019.07.23)
+### 1.1.3 (2019.05.21)
+Patches:
+* Upgrade Nugets
+### 1.1.2 (2018.07.23)
 Patches:
 * Annak a javítása, hogy a DropHandler nem működik Call típusú eseménykezelők kiregisztrálásához
 

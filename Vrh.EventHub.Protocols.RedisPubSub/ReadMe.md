@@ -89,10 +89,12 @@ Ahol:
 <hr></hr>
 
 ## Version History:
+### 2.0.3 (2019.05.21)
+Patches:
+1. Upgrade Nugets
 ### 2.0.2 (2018.07.23)
 Patches:
 1. Core patch (1.1.2) életbe léptetése (csommag függőség az EventHub.Core 1.1.2-re emelve)
-
 ### 2.0.1 (2018.07.04)
 Patches:
 1. Redis küldés és fogadás áttéve önáló szállra (taskpool környezetben való jobb teljesítményért)
@@ -100,12 +102,9 @@ Patches:
 Incopatibility API Changes:
 1. Vrh.Redis.ConnectionStore remove (revert to static lazy base ConnectionMultiplexer share sample)
 2. Configuration XML: RedisConnectionAlias XML tag rename to RedisConnection
-
 ### 1.0.0 (2018.04.06)
 * Initial release with documentation
-
 ## 1.0.0-prerelease (2018.03.26)
 * Initial prerelease without documentation
-
 ## 1.0.0-pre-alpha (2017.12.04)
 * Prototype version
