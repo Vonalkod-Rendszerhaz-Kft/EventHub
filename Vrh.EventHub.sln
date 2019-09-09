@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.705
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrh.EventHub.Core", "Vrh.EventHub.Core\Vrh.EventHub.Core.csproj", "{7E210CD2-9505-49F0-ADF6-175E1825D607}"
 EndProject
@@ -34,6 +34,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{C2D92009-C249-4A22-805E-F08BE542078C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventhubUseSamples", "EventhubUseSamples\EventhubUseSamples.csproj", "{BAF00237-283F-4586-9B3B-43CDEB000002}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisPubSubSimplaChannel", "RedisPubSubSimplaChannel\RedisPubSubSimplaChannel.csproj", "{14BACA5F-96D7-4F63-85DF-8F3676C4EE03}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,6 +79,10 @@ Global
 		{BAF00237-283F-4586-9B3B-43CDEB000002}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BAF00237-283F-4586-9B3B-43CDEB000002}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BAF00237-283F-4586-9B3B-43CDEB000002}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14BACA5F-96D7-4F63-85DF-8F3676C4EE03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14BACA5F-96D7-4F63-85DF-8F3676C4EE03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14BACA5F-96D7-4F63-85DF-8F3676C4EE03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14BACA5F-96D7-4F63-85DF-8F3676C4EE03}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -95,5 +101,9 @@ Global
 		{AE4802B9-D642-4EC5-9619-DEA41C11B852} = {650DB0D3-0E51-4AC4-BDE7-F81B8A2EC0BC}
 		{C2D92009-C249-4A22-805E-F08BE542078C} = {DFF6AC50-958A-442F-A4FC-671F6C4AEB34}
 		{BAF00237-283F-4586-9B3B-43CDEB000002} = {C2D92009-C249-4A22-805E-F08BE542078C}
+		{14BACA5F-96D7-4F63-85DF-8F3676C4EE03} = {FA2CD78B-FE7F-4113-BEF8-85F81FA1E01D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6FF6653E-BAF4-4E01-A7AF-7D92A16739BA}
 	EndGlobalSection
 EndGlobal

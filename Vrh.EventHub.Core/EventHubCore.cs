@@ -14,7 +14,7 @@ namespace Vrh.EventHub.Core
     /// <summary>
     /// Tipusvezérelt esményközvetítő szolgáltatás, mely tetszőleges csatornaimplementáció felett tud működni
     /// </summary>
-    public static partial class EventHubCore
+    public static class EventHubCore
     {
         /// <summary>
         /// Static constructor
