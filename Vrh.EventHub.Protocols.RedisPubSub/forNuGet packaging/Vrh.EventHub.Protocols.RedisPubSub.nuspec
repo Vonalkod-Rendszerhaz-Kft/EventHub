@@ -11,9 +11,9 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-      2.0.3 (2019.05.21)
+      2.0.4 (2019.05.21)
         Patches:
-          Upgrade Nugets
+          Upgrade EventHub.Core to v1.1.4
     </releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/redispubsub</projectUrl>
     <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/eventhubredispubsub.png</iconUrl>

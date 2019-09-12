@@ -43,9 +43,12 @@ namespace Vrh.EventHub.Core
         public static void InitielizeChannel<TChannel>(string channelId)
             where TChannel : BaseChannel, new()
         {
-            var registeredChannel =
-                _channels.FirstOrDefault(x => x.Id == channelId && x.Channel.GetType() == typeof(TChannel))
-                ?? RegisterChannel<TChannel>(channelId);
+            lock (_channels)
+            {
+                var registeredChannel =
+                    _channels.FirstOrDefault(x => x.Id == channelId && x.Channel.GetType() == typeof(TChannel))
+                    ?? RegisterChannel<TChannel>(channelId);
+            }
         }
 
         /// <summary>
@@ -133,9 +136,13 @@ namespace Vrh.EventHub.Core
             where TResponse : new()
             where TChannel : BaseChannel, new()
         {
-            var registeredChannel =
-                _channels.FirstOrDefault(x => x.Id == channelId && x.Channel.GetType() == typeof(TChannel))
-                ?? RegisterChannel<TChannel>(channelId);
+            ChannelRegister registeredChannel = null;
+            lock (_channels)
+            {
+                registeredChannel =
+                    _channels.FirstOrDefault(x => x.Id == channelId && x.Channel.GetType() == typeof(TChannel))
+                    ?? RegisterChannel<TChannel>(channelId);
+            }
             if (!timeOut.HasValue || timeOut.Value.TotalMilliseconds == 0)
             {
                 timeOut = registeredChannel.Channel.GetChannelTimout();
@@ -394,9 +401,12 @@ namespace Vrh.EventHub.Core
                     };
             try
             {
-                var registeredChannel =
-                    _channels.FirstOrDefault(x => x.Id == channelId && x.Channel.GetType() == typeof(TChannel))
-                    ?? RegisterChannel<TChannel>(channelId);
+                ChannelRegister registeredChannel = null;
+                lock (_channels)
+                {
+                    registeredChannel = _channels.FirstOrDefault(x => x.Id == channelId && x.Channel.GetType() == typeof(TChannel))
+                        ?? RegisterChannel<TChannel>(channelId);
+                }
                 string returnType = typeof(void).AssemblyQualifiedName;
                 if (message.GetType().IsGenericType && message.GetType().GetGenericTypeDefinition() == typeof(Request<,>))
                 {
@@ -466,9 +476,12 @@ namespace Vrh.EventHub.Core
         private static void RegisterHandler<TChannel>(string channelId, HandlerRegister handlerRegister)
             where TChannel : BaseChannel, new()
         {
-            var registeredChannel =
-                _channels.FirstOrDefault(x => x.Id == channelId && x.Channel.GetType() == typeof(TChannel))
-                ?? RegisterChannel<TChannel>(channelId);
+            ChannelRegister registeredChannel = null;
+            lock (_channels)
+            {
+                registeredChannel = _channels.FirstOrDefault(x => x.Id == channelId && x.Channel.GetType() == typeof(TChannel))
+                    ?? RegisterChannel<TChannel>(channelId);
+            }
             HandlerRegister existingHandlerRegister = null;
             lock (registeredChannel.Channel.Handlers)
             {
@@ -486,8 +499,8 @@ namespace Vrh.EventHub.Core
             {
                 { "Channel id", channelId },
                 { "Channel type", typeof(TChannel).AssemblyQualifiedName },
-                { "Handler methode", handlerRegister.Handler.Method.Name },
-                { "Class of handler", handlerRegister.Handler.Method.DeclaringType.AssemblyQualifiedName },
+                { "Handler methode", handlerRegister.Handler?.Method.Name },
+                { "Class of handler", handlerRegister.Handler?.Method.DeclaringType.AssemblyQualifiedName },
                 { "Handled message type", handlerRegister.MessageType.AssemblyQualifiedName },
                 { "Result type", handlerRegister.ReturnType.AssemblyQualifiedName },
             };

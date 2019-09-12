@@ -60,7 +60,7 @@ namespace Vrh.EventHub.Core
                 string requestId = (string)concrateMessage.GetType()
                                         .GetProperty("RequestId")
                                         .GetValue(concrateMessage, null);
-                RegisteredCallWait callWait = null;
+                RegisteredCallWait callWait = null; 
                 lock (CallWaits)
                 {
                     callWait = CallWaits.FirstOrDefault(x => x.Id == requestId);
