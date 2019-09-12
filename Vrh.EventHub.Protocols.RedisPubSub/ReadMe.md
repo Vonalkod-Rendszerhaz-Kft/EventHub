@@ -89,6 +89,9 @@ Ahol:
 <hr></hr>
 
 ## Version History:
+### 2.0.6 (2019.09.12)
+Patches:
+1. Upgrade EventHub.Core to v1.1.5 (függőség kijavítása)
 ### 2.0.5 (2019.09.12)
 Patches:
 1. Upgrade EventHub.Core to v1.1.5
