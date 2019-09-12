@@ -21,6 +21,7 @@ namespace Vrh.EventHub.Core
         /// </summary>
         static EventHubCore()
         {
+            EntryAsseblyFixer.FixIt(); 
             var logData = new Dictionary<string, string>
             {
                 { "EventHub endpoint", Assembly.GetEntryAssembly().CodeBase },

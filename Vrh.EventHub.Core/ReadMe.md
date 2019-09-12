@@ -1277,6 +1277,9 @@ Handler bejegyzési költségek üzenetfogadó végpontban:
 <hr></hr>
 
 ## Version History:
+### 1.1.5 (2019.09.12)
+Patches:
+* EntryAssemblyFixer beépítése
 ### 1.1.4 (2019.05.21)
 Patches:
 * Channel register lock-ok pótlása

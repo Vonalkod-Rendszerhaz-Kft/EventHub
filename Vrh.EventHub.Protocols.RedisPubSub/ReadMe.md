@@ -89,6 +89,9 @@ Ahol:
 <hr></hr>
 
 ## Version History:
+### 2.0.5 (2019.09.12)
+Patches:
+1. Upgrade EventHub.Core to v1.1.5
 ### 2.0.4 (2019.05.21)
 Patches:
 1. Upgrade EventHub.Core to v1.1.4

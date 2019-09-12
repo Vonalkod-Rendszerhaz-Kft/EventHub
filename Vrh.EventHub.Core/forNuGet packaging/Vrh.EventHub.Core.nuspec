@@ -11,10 +11,9 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-      1.1.4 (2019.05.21)
+      1.1.5 (2019.09.12)
         Patches:
-          - Channel register lock-ok pótlása
-          - Lognál a Handler nullvédelme a handlerregistereknél
+          - EntryAssemblyFixxer beépítése
     </releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/vrh-eventhub-core</projectUrl>
     <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/eventhub.png</iconUrl>
