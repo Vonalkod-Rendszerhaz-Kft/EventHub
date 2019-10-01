@@ -16,6 +16,10 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
     /// </summary>
     public class RedisPubSubChannel : BaseChannel
     {
+        /// <summary>
+        /// Megmondja, hogy megvan-er  akapcsolat a Redis kiszolgáló felé
+        /// </summary>
+        /// <returns></returns>
         static bool RedisPubSubChannelConnected()
         {
             return Connection.IsConnected;            
@@ -27,18 +31,23 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
         /// <param name="message">Elküldendő üzenet</param>
         public override void Send(EventHubMessage message)
         {
-            var th = new Thread(() => PubSub.Publish(ChannelId, JsonConvert.SerializeObject(message), CommandFlags.HighPriority));
-            th.Name = "SendThread";
-            th.Priority = ThreadPriority.Highest;
-            th.IsBackground = true;
+            var th = new Thread(() => PubSub.Publish(ChannelId, JsonConvert.SerializeObject(message), CommandFlags.HighPriority))
+            {
+                Name = "SendThread",
+                Priority = ThreadPriority.Highest,
+                IsBackground = true
+            };
             th.Start();
         }
 
-        private static Lazy<ConnectionMultiplexer> lazyConnection = new Lazy<ConnectionMultiplexer>(() => {
+        private static readonly Lazy<ConnectionMultiplexer> lazyConnection = new Lazy<ConnectionMultiplexer>(() => {
             var configfile = new EventHubRedisPubSubConfig(GetConfigFile());
             return ConnectionMultiplexer.Connect(configfile.RedisConnection);
         });
 
+        /// <summary>
+        /// Redis connection (shared mintának megfelelő implementáció)
+        /// </summary>
         public static ConnectionMultiplexer Connection
         {
             get
@@ -76,10 +85,12 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
         private void HandleInputMessages(RedisChannel channel, RedisValue message)
         {
             EventHubMessage msg = JsonConvert.DeserializeObject<EventHubMessage>(message);
-            var th = new Thread(() => _coreInputMessageHandler.Invoke(msg));
-            th.Name = "HandleInputMessage Thread";
-            th.Priority = ThreadPriority.Highest;
-            th.IsBackground = true;
+            var th = new Thread(() => _coreInputMessageHandler.Invoke(msg))
+            {
+                Name = "HandleInputMessage Thread",
+                Priority = ThreadPriority.Highest,
+                IsBackground = true
+            };
             th.Start();
         }
 
@@ -174,10 +185,14 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
             }
         }
 
+        /// <summary>
+        /// Visszaadja a használt config fájl nevét
+        /// </summary>
+        /// <returns>Config fájl név</returns>
         private static string GetConfigFile()
         {
             string config = ConfigurationManager.AppSettings[$"{MODUL_PREFIX}:Config"];
-            if (String.IsNullOrEmpty(config))
+            if (string.IsNullOrEmpty(config))
             {
                 config = "Vrh.EventHub.RedisPubSub.Config.xml/Vrh.EventHub.RedisPubSub";
             }
@@ -185,10 +200,15 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
         }
 
         #region IDisposable Support
+        /// <summary>
+        /// Part of Dispose pattern
+        /// </summary>
+        /// <param name="disposing">más dispos-ol?</param>
         protected override void Dispose(bool disposing)
         {
             PubSub.Unsubscribe(ChannelId);
             base.Dispose(disposing);
+            _configuration.Dispose();
         }
 
         #endregion IDisposable Support

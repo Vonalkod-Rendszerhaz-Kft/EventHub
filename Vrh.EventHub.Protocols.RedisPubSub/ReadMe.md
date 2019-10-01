@@ -2,7 +2,7 @@
  
  ![](http://nuget.vonalkod.hu/content/projectavatars/eventhubredispubsub.png)
  
-Ez a leírás a komponens **2.0.0** kiadásáig bezáróan naprakész.
+Ez a leírás a komponens **2.0.7** kiadásáig bezáróan naprakész.
 Igényelt minimális framework verzió: **4.5**
 Teljes funkcionalitás és hatékonyság kihasználásához szükséges legalacsonyabb framework verzió: **4.5**
 
@@ -89,6 +89,9 @@ Ahol:
 <hr></hr>
 
 ## Version History:
+### 2.0.7 (2019.09.25)
+Patches:
+1. Upgrade EventHub.Core to v1.2.0
 ### 2.0.6 (2019.09.12)
 Patches:
 1. Upgrade EventHub.Core to v1.1.5 (függőség kijavítása)

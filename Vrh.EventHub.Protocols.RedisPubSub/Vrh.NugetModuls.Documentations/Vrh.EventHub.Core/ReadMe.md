@@ -1,7 +1,7 @@
 ﻿# Vrh.EventHub.Core
 ![](http://nuget.vonalkod.hu/content/projectavatars/eventhub.png)
 
-*Ez a leírás a komponens **1.1.0** kiadásáig bezáróan naprakész.
+*Ez a leírás a komponens **1.2.0** kiadásáig bezáróan naprakész.
 Igényelt minimális framework verzió: **4.5**
 Teljes funkcionalitás és hatékonyság kihasználásához szükséges legalacsonyabb framework verzió: **4.5***
 
@@ -48,7 +48,7 @@ Az EnventHub csatorna tehát a közvetítő kommunikációs közeget jelenti. A 
 A csatorna implementációk az EventHub használati módjában majd ott jutnak szerephez, hogy az EventHubCore szolgáltatásai mindig generikus hívásokon keresztül érhetőek el, amelyek a csatorna típusát is kijelölik az ennek meghatározását szolgáló típusparaméterükben (Type parameter).
 Az alábbiakban felsorolt létező protokoll implementációknál megadjuk a használandó típus paramétert amely az adott csatornát kijelöli.
 #### Redis Pub/Sub csatorna: Vrh.EventHub.Protocols.RedisPubSub
-Az átvitel a [Redis](www.redis.io) Key-value store adattároló megoldásba épített [Pub/Sub üzenetközvetítő szolgáltatásra](https://redis.io/topics/pubsub) épül. Közismertnek tekintve, nem tárgyaljuk ennek részletes jellemzőit e-helyen, de kiemeljük pár tulajdonságát, amelyik a csatorna implementációnk viselkedését is meghatározza:
+Az átvitel a [Redis](http://www.redis.io) Key-value store adattároló megoldásba épített [Pub/Sub üzenetközvetítő szolgáltatásra](https://redis.io/topics/pubsub) épül. Közismertnek tekintve, nem tárgyaljuk ennek részletes jellemzőit e-helyen, de kiemeljük pár tulajdonságát, amelyik a csatorna implementációnk viselkedését is meghatározza:
 * Rendkivül gyors
 * Csatorna alapú, ahol adott csatornára tetszőleges számú Publikáló (Publisher) és feliratkozó (Subscriber) jelentkezhet fel. Így tetszőleges háló rendszerű, irányfüggetlen kommunikáció kialakítására éppúgy alkalmas, mint egy-egy végpont közti egyirányú kommunikációra.
 * A publikálók számára azt garantálja, hogy a csatornába küldött üzeneteiket az összes a küldés pillanatában a csatornára csatlakozó feliratkozó megkapja. A feliratkozók számára pedig azt garantálja, hogy ha egy Publisher üzenetet küld a csatornára akkor aki feliratkozott rá az meg is kapja azt.
@@ -535,19 +535,15 @@ Tehát:
 * Az ilyen kezelő handlereket az alábbi **RegisterHandler** változattal regisztráljuk:
 ```csharp
 /// <summary>
-/// Regisztrál a megadott csatorna fölött egy üzenetkezelőt, 
-///     amelyik egy adott típusú kérést kezel, 
-///     és egy adott típusú (ehhez a kéréshez tartozó) 
-///     válasszal tér vissza.
+/// Registrál a megadott csatorna fölött egy üzenetkezelőt, amelyik egy adott típusú kérést kezel, 
+///     és egy adott típusú (ehhez a kéréshez tartozó) válaszszal tér vissza.
 /// Az ilyen üzenetkezelők a Call hívások fogadó oldalán kerülnek meghívásra!
 /// </summary>
 /// <typeparam name="TChannel">Csatorna típusa</typeparam>
 /// <typeparam name="TRequest">Kérés típusa</typeparam>
 /// <typeparam name="TResponse">Válasz típusa</typeparam>
 /// <param name="channelId">Csatorna azonosító</param>
-/// <param name="handler">Üzenet kezelő --> 
-///     TResponse<TResponse> X(Request<TRequest, TResponse>) szignaturával
-/// </param>
+/// <param name="handler">Üzenet kezelő --> Tesponse/TResponse/ X(Request/TRequest, TResponse/) </param>
 public static void RegisterHandler<TChannel, TRequest, TResponse>(
     string channelId, Func<Request<TRequest, TResponse>, Response<TResponse>> handler)
         where TRequest : new()
@@ -638,18 +634,19 @@ Tehát:
 Az ilyen kezelő handlereket az alábbi **RegisterHandler** változattal regisztráljuk:
 ```csharp
 /// <summary>
-/// Regisztrál egy olyan üzenetkezelőt, 
-///     amelynek nincs visszatérési értéke és egy adott típusú beérkező üzenetet kezel
-/// Aszinkron, (feltehetően visszajelzés nélküli) üzenet feldolgozás implementálásához
-/// <typeparam name="TChannel">Csatorna típusa, amely felett az üzenetkezelő működik</typeparam>
-/// <typeparam name="TMessage">Üzenet típusa, amelyet ez a kezelő dolgoz fel</typeparam>
-/// <param name="channelId">Csatorna azonosító: ezen a csatornán érkező üzeneteket dolgozza fel 
-///     a kezelő</param>
-/// <param name="handler">Metódus referencia, ez a metódus végzi a tényleges feldolgozást 
-///     --> void X(TMessage)</param>
-public static void RegisterHandler<TChannel, TMessage>(string channelId, Action<TMessage> handler)
-            where TMessage : new()
-            where TChannel : BaseChannel, new()
+/// Regisztrál egy olyan üzenetketzelőt, 
+///     amelynek nincs vissaztérési értéke és egy adott típusú beérkező üzenetet kezel
+/// Aszinkron, (feltehetően visszajelzés nélküli) üzenetfeldolgozás implementálásához
+/// </summary>
+/// <typeparam name="TChannel">Csatorna típusa, emely felett az üzenetkezelő működik</typeparam>
+/// <typeparam name="TMessage">Üzenet típusa, emylet ez a kezelő dolgoz fel</typeparam>
+/// <param name="channelId">Csatorna azonosító: ezen a csatornán érkező üzeneteket dolgozza fel a kezelő</param>
+/// <param name="handler">Metódus referencia, ez a metódus végzi a tényleges feldolgozást --> void X(TMessage)</param>
+/// <param name="overrideHandler">Segítségével előítrható, hogy regisztrálja felül a végpontban (alkalmazástérben) meglévő kezelőt</param>                
+public static void RegisterHandler<TChannel, TMessage>(
+    string channelId, Action<TMessage> handler, bool overrideHandler = true)
+        where TMessage : new()
+        where TChannel : BaseChannel, new()
 ```
 Amennyiben a regisztrálandó metódus szignatúrája nem felel meg a fenti szabályoknak úgy nem lesz regisztrálható a **RegisterHandler** ezen túlterhelésável. (Compile time error!)
 
@@ -712,20 +709,22 @@ Tehát:
 * Az ilyen kezelő handlereket az alábbi **RegisterHandler** változattal regisztráljuk:
 ```csharp
 /// <summary>
-/// Regisztrál a megadott csatorna fölött egy Requesteket fogadó üzenetkezelőt, 
-/// melynek nincs visszatérési értéke
+/// Registrál a megadott csatorna fölött egy Requesteket fogadó üzenetkezelőt, 
+/// melynek nincs visszatérési értéke 
 /// Aszinkron Request/Response implementációkhoz a kérések fogadó oldalán
 /// </summary>
 /// <typeparam name="TChannel">Csatorna típus implementáció</typeparam>
 /// <typeparam name="TRequest">Kérés típusa</typeparam>
 /// <typeparam name="TResponse">Válasz típusa</typeparam>
 /// <param name="channelId">Csatorna azonosító</param>
-/// <param name="handler">üzenetkezelő --> void TResponse X(TRequest)</param>
+/// <param name="handler">üzenetkezelő --> void X(TRequest)</param>
+/// <param name="overrideHandler">Segítségével előítrható, hogy regisztrálja felül a végpontban (alkalmazástérben) meglévő kezelőt</param>
 public static void RegisterHandler<TChannel, TRequest, TResponse>(
-        string channelId, Action<Request<TRequest, TResponse>> handler)
-            where TRequest : new()
-            where TResponse : new()
-            where TChannel : BaseChannel, new()
+    string channelId, Action<Request<TRequest, TResponse>> handler, 
+    bool overrideHandler = true)
+        where TRequest : new()
+        where TResponse : new()
+        where TChannel : BaseChannel, new()
 ```
 Amennyiben a regisztrálandó metódus szignatúrája nem felel meg a fenti szabályoknak úgy nem lesz regisztrálható a **RegisterHandler** ezen túlterhelésével. (Compile time error!)
 
@@ -834,10 +833,12 @@ Tehát:
 /// <typeparam name="TResponse">Válasz típusa</typeparam>
 /// <param name="channelId">Csatorna azonosító</param>
 /// <param name="handler">Üzenet kezelő --> void X(Response/TResponse/) </param>
+/// <param name="overrideHandler">Segítségével előítrható, hogy regisztrálja felül a végpontban (alkalmazástérben) meglévő kezelőt</param>
 public static void RegisterHandler<TChannel, TResponse>(
-        string channelId, Action<Response<TResponse>> handler)
-            where TResponse : new()
-            where TChannel : BaseChannel, new()
+    string channelId, Action<Response<TResponse>> handler, 
+    bool overrideHandler = true)
+        where TResponse : new()
+        where TChannel : BaseChannel, new()
 ```
 Amennyiben a regisztrálandó metódus szignatúrája nem felel meg a fenti szignatúrára vonatkozó szabályoknak úgy nem lesz regisztrálható a **RegisterHandler** ezen túlterhelésével. (Compile time error!)
 
@@ -1277,6 +1278,12 @@ Handler bejegyzési költségek üzenetfogadó végpontban:
 <hr></hr>
 
 ## Version History:
+### 1.2.0 (2019.09.25)
+Compatibility API changes:
+- Lehetőség van rá előírni, hogy a handler register figyelembe vegye a regisztrált handlert is, és nem írja felül, ha nem egyezik egy korábban regisztráltal. Ennek segítségével lehet ugyanabban az alkalmazás térben többszörös handlereket üzemeltetni ugyanarra a contractra. (Nincs rá további built-in támogatás ezért szinkron call-oknál nincs értelme. Ezért a lehetőség a szinkron call regisztrációknál továbbra sem érhető el!!!)
+
+Patches:
+- Ha több handler van regisztrrálva egy végponton, akkor az EventHub.Core gondoskodik róla, hogy az érkező üzenetekre az összes regisztrált kezelőt végighívja.
 ### 1.1.5 (2019.09.12)
 Patches:
 * EntryAssemblyFixer beépítése
