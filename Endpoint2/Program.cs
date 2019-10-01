@@ -20,13 +20,13 @@ namespace Endpoint2
             Write($"1. handler bejegyzési ideje: {cost} millisec");
 
             startTime = DateTime.UtcNow;
-            EventHubCore.RegisterHandler<RedisPubSubChannel, TestConctract.StartNewRound>(TestConctract.CHANNEL_ID, ReceiveStartNewRound);
+            EventHubCore.RegisterHandler<RedisPubSubChannel, TestConctract.StartNewRound>(TestConctract.CHANNEL_ID, ReceiveStartNewRound, true);
             endTime = DateTime.UtcNow;
             cost = endTime.Subtract(startTime).TotalMilliseconds;
             Write($"2. handler bejegyzési ideje: {cost} millisec");
 
             startTime = DateTime.UtcNow;
-            EventHubCore.RegisterHandler<RedisPubSubChannel, TestConctract.TestMessage>(TestConctract.CHANNEL_ID, ReceiveTestMessage);
+            EventHubCore.RegisterHandler<RedisPubSubChannel, TestConctract.TestMessage>(TestConctract.CHANNEL_ID, ReceiveTestMessage, true);
             endTime = DateTime.UtcNow;
             cost = endTime.Subtract(startTime).TotalMilliseconds;
             Write($"3. handler bejegyzési ideje: {cost} millisec");

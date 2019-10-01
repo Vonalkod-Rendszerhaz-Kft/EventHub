@@ -11,14 +11,14 @@ namespace Endpoint1
 {
     class Program
     {
-        static AutoResetEvent _waitForTestRuns = new AutoResetEvent(false);
+        static readonly AutoResetEvent _waitForTestRuns = new AutoResetEvent(false);
 
 
-        static private int _round = 0;
+        private static int _round = 0;
 
-        static private int _testruns = 0;
+        private static readonly int _testruns = 0;
 
-        static object _staticlocker = new object();
+        static readonly object _staticlocker = new object();
 
         static void Main(string[] args)
         {
@@ -52,7 +52,7 @@ namespace Endpoint1
             //    _testruns = 0;
             //} while (true);
 
-            string exit = String.Empty;
+            string exit = string.Empty;
             while (exit != "e")
             {
                 Warmup();
@@ -104,7 +104,7 @@ namespace Endpoint1
             }
         }
 
-        private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+        private static readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
         public static void Warmup()
         {
@@ -153,7 +153,7 @@ namespace Endpoint1
         private static void AsyncCallThroughputWithEndSignal()
         {
             Write("TestRun #2: Aszinkron átbocsátás-----------------------------------------------------");
-            EventHubCore.RegisterHandler<RedisPubSubChannel, TestConctract.AllOk>(TestConctract.CHANNEL_ID, AllOk);
+            EventHubCore.RegisterHandler<RedisPubSubChannel, TestConctract.AllOk>(TestConctract.CHANNEL_ID, AllOk, true);
             EventHubCore.Send<RedisPubSubChannel, TestConctract.StartNewRound>(TestConctract.CHANNEL_ID, new TestConctract.StartNewRound());
             if (!WaitAllReceiveSemafor.WaitOne(TestConctract.TEST_ROUNDS * 1000))
             {
@@ -184,7 +184,7 @@ namespace Endpoint1
         private static void FullAsyncCallThroughputWithEndSignal()
         {
             Write("TestRun #3: Teljesen aszinkron átbocsátás (aszinkron is küldve)-----------------------------------------------------");
-            EventHubCore.RegisterHandler<RedisPubSubChannel, TestConctract.AllOk>(TestConctract.CHANNEL_ID, AllOk);
+            EventHubCore.RegisterHandler<RedisPubSubChannel, TestConctract.AllOk>(TestConctract.CHANNEL_ID, AllOk, true);
             EventHubCore.Send<RedisPubSubChannel, TestConctract.StartNewRound>(TestConctract.CHANNEL_ID, new TestConctract.StartNewRound());
             if (!WaitAllReceiveSemafor.WaitOne(TestConctract.TEST_ROUNDS * 1000))
             {
@@ -235,7 +235,7 @@ namespace Endpoint1
             // Teljesítmény mérésnél vedd ki kommentből a returnt, 
             //  hogy ne mérd bele a szinkronizált Console.Write-ok költségét
             // Ha a közbeni müködés részleteit is látni akarod consolüzenetekben, akkor commentezd a returnt.
-            return;
+            //return;
             Task.Run(() => Write(line));
         }
 
@@ -247,7 +247,7 @@ namespace Endpoint1
             }
         }
 
-        private static object _consoleLocker = new object();
+        private static readonly object _consoleLocker = new object();
     }
 
     public class TestConctract

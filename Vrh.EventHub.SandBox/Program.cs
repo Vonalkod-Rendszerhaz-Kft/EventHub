@@ -66,14 +66,14 @@ namespace Vrh.EventHub.SandBox
 
         public void ErrorHandlingTest()
         {
-            EventHubCore.RegisterHandler<RedisPubSubChannel, TwoNumber>("ch1", MyHandler);
+            EventHubCore.RegisterHandler<RedisPubSubChannel, TwoNumber>("ch1", MyHandler, true);
             Console.WriteLine("Redis DOWN, ENTER");
             Console.ReadLine();
             EventHubCore.RegisterHandler<RedisPubSubChannel, TwoNumber, int>("ch1", Add);
             Console.WriteLine("CH1 registration is success");
             try
             {
-                EventHubCore.RegisterHandler<RedisPubSubChannel, TwoNumber>("ch2", MyHandler);
+                EventHubCore.RegisterHandler<RedisPubSubChannel, TwoNumber>("ch2", MyHandler, true);
                 Console.WriteLine("CH2 registration is success");
             }
             catch(Exception e)
@@ -119,9 +119,9 @@ namespace Vrh.EventHub.SandBox
 
         public void Init()
         {
-            EventHubCore.RegisterHandler<RedisPubSubChannel, TwoNumber>("testchannel", MyHandler);
+            EventHubCore.RegisterHandler<RedisPubSubChannel, TwoNumber>("testchannel", MyHandler, true);
             EventHubCore.RegisterHandler<RedisPubSubChannel, TwoNumber, int>("testchannel", Add);
-            EventHubCore.RegisterHandler<RedisPubSubChannel, int>("testchannel", Print);
+            EventHubCore.RegisterHandler<RedisPubSubChannel, int>("testchannel", Print, true);
         }
 
         public void Print(Response<int> m)
@@ -281,8 +281,8 @@ namespace Vrh.EventHub.SandBox
         public PingPong(int round)
         {
             _round = round;
-            EventHubCore.RegisterHandler<TChannel, PingPongConcrat.Ping>(CHANNEL_ID, Ping);
-            EventHubCore.RegisterHandler<TChannel, PingPongConcrat.Pong>(CHANNEL_ID, Pong);
+            EventHubCore.RegisterHandler<TChannel, PingPongConcrat.Ping>(CHANNEL_ID, Ping, true);
+            EventHubCore.RegisterHandler<TChannel, PingPongConcrat.Pong>(CHANNEL_ID, Pong, true);
             EventHubCore.Send<TChannel, PingPongConcrat.Ping>(CHANNEL_ID, new PingPongConcrat.Ping { No = 1, StartTime = DateTime.UtcNow });
         }
 

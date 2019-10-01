@@ -62,11 +62,11 @@ namespace EventhubUseSamples
         public AddMachine()
         {
             // Aszinkron válasz nélkül
-            EventHubCore.RegisterHandler<RedisPubSubChannel, AddThis>("addmachine", AddAndNothing);            
+            EventHubCore.RegisterHandler<RedisPubSubChannel, AddThis>("addmachine", AddAndNothing, true);            
             // A hívó oldal call-t fog hívni, és a válasz közvetlenül visszamegy a hívó oldalra
             EventHubCore.RegisterHandler<RedisPubSubChannel, AddThis, Result>("addmachine", AddForSyncUse);
             // Aszinkron az EventHub.Core Request-Response szolgáltatásainak kihasználásával
-            EventHubCore.RegisterHandler<RedisPubSubChannel, Request<AddThis, Result>>("addmachine", AddForAsyncUse);
+            EventHubCore.RegisterHandler<RedisPubSubChannel, Request<AddThis, Result>>("addmachine", AddForAsyncUse, true);
             // Aszinkron egyedi megvalósítással
             //
         }
@@ -132,7 +132,7 @@ namespace EventhubUseSamples
         {
             Program.Write("Sample #3: Async Send with Response handling -------------------------------------------------------------------------");
             // Mindig először az eseménykezelőt regisztráljuk, ami a választ foigja fogadni!!!
-            EventHubCore.RegisterHandler<RedisPubSubChannel, Result>("addmachine", ReceiveAddMachineAsyncResult);
+            EventHubCore.RegisterHandler<RedisPubSubChannel, Result>("addmachine", ReceiveAddMachineAsyncResult, true);
             // Összeállítja a Request<T, T> példányt, amelyik a kérést reprezentálja    
             var request = new Request<AddThis, Result>();
             request.RequestContent = new AddThis { Numbers = _numbers };
