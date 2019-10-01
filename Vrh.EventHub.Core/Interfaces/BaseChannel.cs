@@ -75,37 +75,42 @@ namespace Vrh.EventHub.Core
                     return;
                 }
             }
-            HandlerRegister handler = null;
+            IEnumerable<HandlerRegister> handlers = null;
             lock (Handlers)
             {
-                handler = Handlers.FirstOrDefault(x => x.MessageType.AssemblyQualifiedName == msg.MessageType
+                handlers = Handlers.Where(x => x.MessageType.AssemblyQualifiedName == msg.MessageType
                                                         && x.ReturnType.AssemblyQualifiedName == msg.ReturnType);
             }
-            if (handler != null)
+            if (handlers != null)
             {
-                logData.Add("Called handler", handler.Handler.Method.Name);
-                if (handler.ReturnType == typeof(void))
+                int i = 0;
+                foreach (var handler in handlers)
                 {
-                    handler.Handler.Method.Invoke(handler.Handler.Target, (new object[] { concrateMessage }));
-                    VrhLogger.Log("Message receive and call handler async succesfull.",
-                        logData, null, LogLevel.Verbose, this.GetType());
-                }
-                else
-                {
-                    try
+                    i++;
+                    logData.Add($"Called handler #{i}", handler.Handler.Method.Name);
+                    if (handler.ReturnType == typeof(void))
                     {
-                        var result = handler.Handler.Method.Invoke(handler.Handler.Target, new object[] { concrateMessage });
-                        Send(new EventHubMessage()
-                        {
-                            ConcrateMessage = JsonConvert.SerializeObject(result),
-                            MessageType = result.GetType().AssemblyQualifiedName,
-                            ReturnType = typeof(void).AssemblyQualifiedName,
-                        });
+                        handler.Handler.Method.Invoke(handler.Handler.Target, (new object[] { concrateMessage }));
+                        VrhLogger.Log("Message receive and call handler async succesfull.",
+                            logData, null, LogLevel.Verbose, this.GetType());
                     }
-                    catch (Exception e)
+                    else
                     {
-                        VrhLogger.Log("Call handler succes, by unwanted exception recieve from handler methode!",
-                            logData, e, LogLevel.Error, this.GetType());
+                        try
+                        {
+                            var result = handler.Handler.Method.Invoke(handler.Handler.Target, new object[] { concrateMessage });
+                            Send(new EventHubMessage()
+                            {
+                                ConcrateMessage = JsonConvert.SerializeObject(result),
+                                MessageType = result.GetType().AssemblyQualifiedName,
+                                ReturnType = typeof(void).AssemblyQualifiedName,
+                            });
+                        }
+                        catch (Exception e)
+                        {
+                            VrhLogger.Log("Call handler succes, by unwanted exception recieve from handler methode!",
+                                logData, e, LogLevel.Error, this.GetType());
+                        }
                     }
                 }
             }
@@ -149,7 +154,10 @@ namespace Vrh.EventHub.Core
         protected Action<EventHubMessage> _coreInputMessageHandler;
 
         #region IDisposable Support
-        protected bool disposedValue = false; // To detect redundant calls
+        /// <summary>
+        /// To detect redundant calls
+        /// </summary>
+        protected bool disposedValue = false;
 
         /// <summary>
         /// Leszármazottban felülírandó, és el kell végezni a csatorna specifikus clean-t, 
@@ -197,7 +205,9 @@ namespace Vrh.EventHub.Core
         //   Dispose(false);
         // }
 
-        // This code added to correctly implement the disposable pattern.
+        /// <summary>
+        /// This code added to correctly implement the disposable pattern.
+        /// </summary>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.

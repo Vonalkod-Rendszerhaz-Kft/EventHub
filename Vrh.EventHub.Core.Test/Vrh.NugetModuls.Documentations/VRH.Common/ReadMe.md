@@ -186,6 +186,32 @@ public class SelectListGroup
 
 
 # Version History:
+
+## 2.9.0 (2019.09.12):      
+### Compatibility API changes:      
+- EntryAsseblyFixer static class hozzáadása, ami beállítja  amegfelelő EntryAssembly-t, ha az alakalmazás tér dinamikus hostolású, ahol null, vagy dynamic az EntryAssembly
+- EntryAsseblyFixer egység tesztjei
+
+## 2.8.1 (2019.09.07):
+### Patch:
+- Name property típusa javítva.
+
+## v2.8.0 (2019.09.06):
+### Compatibility API changes:
+- ReturnDictJSON adatstruktúra hozzáadva.
+
+## 2.7.0 (2019.08.15) Compatible changes:      
+### Compatibility API changes:      
+- Az EntityFramework extension bővítése az AlreadyOrdered függvénynel, amely megmondja egy IQueryable-ről, hogy rendezett-e már (tehát a további rendezéséhez az OrderBy, vagy a ThenBy-t kell-e használni)
+
+## 2.6.0 (2019.08.01) Compatible changes:      
+### Compatibility API changes:      
+- Extensions bővítése az EntityFramework extension-nel, EntityFrameworkQueryHelper bővítő osztály, SmartOrder bővítő metódus (IQueryable típusra)
+
+## 2.5.0 (2019.07.10) Compatible changes:      
+### Compatibility API changes:      
+- ExtensionMethods bővítése az Enum extensionssel, Enumdata attribútum osztály
+
 ## 2.3.0 (2019.05.14) Compatible changes:      
 - IManage interfész áthelyezése Vrh.Web.Common.Lib 1.18.1-es változatából.
 - Standard osztályok (CheckListJSON, ReturnInfoJSON, SelectListJSON) áthelyezése Vrh.Web.Common.Lib 1.18.1-es változatából.

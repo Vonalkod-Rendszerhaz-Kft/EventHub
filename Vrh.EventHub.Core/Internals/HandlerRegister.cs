@@ -12,7 +12,7 @@ namespace Vrh.EventHub.Core
         ///     amelynek nincs vissaztérési értéke és egy adott típusú beérkező üzenetet kezel
         /// Aszinkron, (feltehetően visszajelzés nélküli) üzenetfeldolgozás implementálásához
         /// </summary>
-        /// <typeparam name="TMessage">Üzenet típus, melre a kezelő kötve van</typeparam>
+        /// <typeparam name="TMessage">Üzenet típus, melyre a kezelő kötve van</typeparam>
         /// <param name="handler">Üzenet kezelő metódus referencia</param>
         /// <returns>Handler nyilvántartó példány</returns>
         internal static HandlerRegister RegistHandler<TMessage>(Action<TMessage> handler)

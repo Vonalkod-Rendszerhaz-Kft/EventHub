@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using Vrh.Logger;
 using VRH.Common;
@@ -65,7 +64,7 @@ namespace Vrh.EventHub.Core
             where TMessage : new()
             where TChannel : BaseChannel, new()
         {
-            EventHubSend<TChannel, TMessage>(channelId, message);
+            EventHubSend<TChannel, TMessage>(channelId, message, true);
         }
 
         /// <summary>
@@ -85,25 +84,7 @@ namespace Vrh.EventHub.Core
             where TMessage : new()
             where TChannel : BaseChannel, new()
         {
-            Task.Run(() => EventHubSend<TChannel, TMessage>(channelId, message));
-        }
-
-        /// <summary>
-        /// Aszinkron Request üzenetküldés: Kérés oldal -> Elküld egy Request-et 
-        /// A küldés során keletkező exceptiön-ök (Pl. közvetitő infrastruktúra hibái) az EventHub 
-        ///     keret ThrowException beállításától függően mennek vagy nem mennek fel a hívási helyre. 
-        /// </summary>
-        /// <typeparam name="TChannel">Csatorna implementáció típusa</typeparam>
-        /// <typeparam name="TRequest">Kérés típusa</typeparam>
-        /// <typeparam name="TResponse">Kérés típusa</typeparam>        
-        /// <param name="channelId">Csatorna azonosító, ahová küldi</param>
-        /// <param name="request">Kérés üzenet</param>
-        public static void Send<TChannel, TRequest, TResponse>(string channelId, Request<TRequest, TResponse> request)
-            where TRequest : new()
-            where TResponse : new()
-            where TChannel : BaseChannel, new()
-        {
-            EventHubSend<TChannel, Request<TRequest, TResponse>>(channelId, request);
+            Task.Run(() => EventHubSend<TChannel, TMessage>(channelId, message, true));
         }
 
         /// <summary>
@@ -118,7 +99,7 @@ namespace Vrh.EventHub.Core
             where TResponse : new()
             where TChannel : BaseChannel, new()
         {
-            EventHubSend<TChannel, Response<TResponse>>(channelId, response);
+            EventHubSend<TChannel, Response<TResponse>>(channelId, response, true);
         }
 
         /// <summary>
@@ -175,65 +156,21 @@ namespace Vrh.EventHub.Core
             return responseMessage.ResponseContent;
         }
 
-        private static async Task SafeCall<TChannel, TRequest, TResponse>(ChannelRegister registeredChannel, RegisteredCallWait callWait, Request<TRequest, TResponse> requestMessage, TimeSpan? timeOut = null)
-            where TRequest : new()
-            where TResponse : new()
-            where TChannel : BaseChannel, new()
-        {
-            lock (registeredChannel.Channel.CallWaits)
-            {
-                registeredChannel.Channel.CallWaits.Add(callWait);
-            }
-            try
-            {
-                try
-                {                    
-                    Send<TChannel, TRequest, TResponse>(registeredChannel.Id, requestMessage);
-                    if (!(await callWait.WaitResponseSemaforSlim.WaitAsync(timeOut.Value)))
-                    {
-                        callWait.Response = new Response<TResponse>()
-                        {
-                            Exception = new FatalEventHubException("Call Request Timout occured!")
-                        };
-                    }
-                }
-                finally
-                {
-                    lock (registeredChannel.Channel.CallWaits)
-                    {
-                        registeredChannel.Channel.CallWaits.Remove(callWait);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                VrhLogger.Log("EventHub Call Error!",
-                    new Dictionary<string, string>()
-                    {
-                            {"Channel id", registeredChannel.Id},
-                            {"Request", JsonConvert.SerializeObject(requestMessage) },
-                    },
-                    e,
-                    LogLevel.Fatal,
-                    typeof(EventHubCore));
-                throw e;
-            }
-        }
-
         /// <summary>
         /// Regisztrál egy olyan üzenetketzelőt, 
         ///     amelynek nincs vissaztérési értéke és egy adott típusú beérkező üzenetet kezel
         /// Aszinkron, (feltehetően visszajelzés nélküli) üzenetfeldolgozás implementálásához
+        /// </summary>
         /// <typeparam name="TChannel">Csatorna típusa, emely felett az üzenetkezelő működik</typeparam>
         /// <typeparam name="TMessage">Üzenet típusa, emylet ez a kezelő dolgoz fel</typeparam>
         /// <param name="channelId">Csatorna azonosító: ezen a csatornán érkező üzeneteket dolgozza fel a kezelő</param>
         /// <param name="handler">Metódus referencia, ez a metódus végzi a tényleges feldolgozást --> void X(TMessage)</param>
-        /// </summary>
-        public static void RegisterHandler<TChannel, TMessage>(string channelId, Action<TMessage> handler)
+        /// <param name="overrideHandler">Segítségével előítrható, hogy regisztrálja felül a végpontban (alkalmazástérben) meglévő kezelőt</param>                
+        public static void RegisterHandler<TChannel, TMessage>(string channelId, Action<TMessage> handler, bool overrideHandler = true)
             where TMessage : new()
             where TChannel : BaseChannel, new()
         {
-            RegisterHandler<TChannel>(channelId, HandlerRegister.RegistHandler(handler));
+            RegisterHandler<TChannel>(channelId, HandlerRegister.RegistHandler(handler), overrideHandler);
         }
 
         /// <summary>
@@ -246,27 +183,31 @@ namespace Vrh.EventHub.Core
         /// <typeparam name="TResponse">Válasz típusa</typeparam>
         /// <param name="channelId">Csatorna azonosító</param>
         /// <param name="handler">üzenetkezelő --> void X(TRequest)</param>
-        public static void RegisterHandler<TChannel, TRequest, TResponse>(string channelId, Action<Request<TRequest, TResponse>> handler)
+        /// <param name="overrideHandler">Segítségével előítrható, hogy regisztrálja felül a végpontban (alkalmazástérben) meglévő kezelőt</param>
+        public static void RegisterHandler<TChannel, TRequest, TResponse>(string channelId, Action<Request<TRequest, TResponse>> handler, bool overrideHandler = true)
             where TRequest : new()
             where TResponse : new()
             where TChannel : BaseChannel, new()
         {
-            RegisterHandler<TChannel>(channelId, HandlerRegister.RegistHandler(handler));
+            RegisterHandler<TChannel>(channelId, HandlerRegister.RegistHandler(handler), overrideHandler);
         }
 
         /// <summary>
-        /// Registrál egy kifejezetten response üzeneteket kezelő handlert (nincs visszatérési értéke)
-        /// Aszinkron Request/Response implementációkhoz
+        /// Regisztrál egy kifejezetten response üzeneteket kezelő handlert 
+        ///     (nincs visszatérési értéke)
+        /// Aszinkron Request/Response implementációkhoz a kéréseket (request) küldő oldalán, 
+        ///     a válaszok (response) fogadásának céljából
         /// </summary>
         /// <typeparam name="TChannel">Csatorna típus</typeparam>
         /// <typeparam name="TResponse">Válasz típusa</typeparam>
         /// <param name="channelId">Csatorna azonosító</param>
         /// <param name="handler">Üzenet kezelő --> void X(Response/TResponse/) </param>
-        public static void RegisterHandler<TChannel, TResponse>(string channelId, Action<Response<TResponse>> handler)
+        /// <param name="overrideHandler">Segítségével előítrható, hogy regisztrálja felül a végpontban (alkalmazástérben) meglévő kezelőt</param>
+        public static void RegisterHandler<TChannel, TResponse>(string channelId, Action<Response<TResponse>> handler, bool overrideHandler = true)
             where TResponse : new()
             where TChannel : BaseChannel, new()
         {
-            RegisterHandler<TChannel>(channelId, HandlerRegister.RegistHandler(handler));
+            RegisterHandler<TChannel>(channelId, HandlerRegister.RegistHandler(handler), overrideHandler);
         }
 
         /// <summary>
@@ -285,7 +226,7 @@ namespace Vrh.EventHub.Core
             where TResponse : new()
             where TChannel : BaseChannel, new()
         {
-            RegisterHandler<TChannel>(channelId, HandlerRegister.RegistHandler(handler));
+            RegisterHandler<TChannel>(channelId, HandlerRegister.RegistHandler(handler), true);
         }
 
         /// <summary>
@@ -383,13 +324,89 @@ namespace Vrh.EventHub.Core
         }
 
         /// <summary>
+        /// Aszinkron Request üzenetküldés: Kérés oldal -> Elküld egy Request-et 
+        /// A küldés során keletkező exceptiön-ök (Pl. közvetitő infrastruktúra hibái) az EventHub 
+        ///     keret ThrowException beállításától függően mennek vagy nem mennek fel a hívási helyre. 
+        /// </summary>
+        /// <typeparam name="TChannel">Csatorna implementáció típusa</typeparam>
+        /// <typeparam name="TRequest">Kérés típusa</typeparam>
+        /// <typeparam name="TResponse">Kérés típusa</typeparam>        
+        /// <param name="channelId">Csatorna azonosító, ahová küldi</param>
+        /// <param name="request">Kérés üzenet</param>
+        private static void Send<TChannel, TRequest, TResponse>(string channelId, Request<TRequest, TResponse> request)
+            where TRequest : new()
+            where TResponse : new()
+            where TChannel : BaseChannel, new()
+        {
+            EventHubSend<TChannel, Request<TRequest, TResponse>>(channelId, request, false);
+        }
+
+        /// <summary>
+        /// Szinkron üzenetküldés/válasz fogadás (Call) megvalósítása taskpool felett is jól működő szemaforokkal
+        ///     (Küldő oldal)
+        /// </summary>
+        /// <typeparam name="TChannel">Használt csatorna típusa</typeparam>
+        /// <typeparam name="TRequest">Kérés típus</typeparam>
+        /// <typeparam name="TResponse">Válasz típus</typeparam>
+        /// <param name="registeredChannel">referencia csatorna regisztráció példányra (a híváshoz tartozó callwaitek kezeléséhez)</param>
+        /// <param name="callWait">referencia a híváshoz tartozó callwait-re</param>
+        /// <param name="requestMessage">kérés üzenet, amit küldünk</param>
+        /// <param name="timeOut">a használt timeout</param>
+        /// <returns></returns>
+        private static async Task SafeCall<TChannel, TRequest, TResponse>(ChannelRegister registeredChannel, RegisteredCallWait callWait, Request<TRequest, TResponse> requestMessage, TimeSpan? timeOut = null)
+            where TRequest : new()
+            where TResponse : new()
+            where TChannel : BaseChannel, new()
+        {
+            lock (registeredChannel.Channel.CallWaits)
+            {
+                registeredChannel.Channel.CallWaits.Add(callWait);
+            }
+            try
+            {
+                try
+                {
+                    Send<TChannel, TRequest, TResponse>(registeredChannel.Id, requestMessage);
+                    if (!(await callWait.WaitResponseSemaforSlim.WaitAsync(timeOut.Value)))
+                    {
+                        callWait.Response = new Response<TResponse>()
+                        {
+                            Exception = new FatalEventHubException("Call Request Timout occured!")
+                        };
+                    }
+                }
+                finally
+                {
+                    lock (registeredChannel.Channel.CallWaits)
+                    {
+                        registeredChannel.Channel.CallWaits.Remove(callWait);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                VrhLogger.Log("EventHub Call Error!",
+                    new Dictionary<string, string>()
+                    {
+                            {"Channel id", registeredChannel.Id},
+                            {"Request", JsonConvert.SerializeObject(requestMessage) },
+                    },
+                    e,
+                    LogLevel.Fatal,
+                    typeof(EventHubCore));
+                throw e;
+            }
+        }
+
+        /// <summary>
         /// Eventhub üzenet elküldése adott csatorna implementáción
         /// </summary>
         /// <typeparam name="TChannel">Csatorna implementáció típusa</typeparam>
         /// <typeparam name="TMessage">Küldendő üzenet típus</typeparam>
         /// <param name="channelId">Csatorna azonosító, ahová küldi</param>
         /// <param name="message">Üzenet</param>
-        private static void EventHubSend<TChannel, TMessage>(string channelId, object message)
+        /// <param name="noReturn">Jelzi, hogy nem várunk visszatérési értéket a hívástól</param>
+        private static void EventHubSend<TChannel, TMessage>(string channelId, object message, bool noReturn)
             where TMessage : new()
             where TChannel : BaseChannel, new()
         {
@@ -409,7 +426,7 @@ namespace Vrh.EventHub.Core
                         ?? RegisterChannel<TChannel>(channelId);
                 }
                 string returnType = typeof(void).AssemblyQualifiedName;
-                if (message.GetType().IsGenericType && message.GetType().GetGenericTypeDefinition() == typeof(Request<,>))
+                if (message.GetType().IsGenericType && message.GetType().GetGenericTypeDefinition() == typeof(Request<,>) && !noReturn)
                 {
                     var retType = message.GetType().GenericTypeArguments[1];
                     var responseGeneric = typeof(Response<>);
@@ -474,7 +491,9 @@ namespace Vrh.EventHub.Core
         /// <typeparam name="TChannel">A csatorna típusa, main a handler működik</typeparam>
         /// <param name="channelId">csatorna azonosítója</param>
         /// <param name="handlerRegister">üzenetkezelő regisztrációs objektum</param>
-        private static void RegisterHandler<TChannel>(string channelId, HandlerRegister handlerRegister)
+        /// <param name="overrideHandler">jelzi, hogy ha létezik handler akkor az felülírandó-e (false), 
+        ///     vagy párhozamosan bejegyzünk egy handlert ugyanarra a kontraktra az alkalmazástérben (true)</param>
+        private static void RegisterHandler<TChannel>(string channelId, HandlerRegister handlerRegister, bool overrideHandler)
             where TChannel : BaseChannel, new()
         {
             ChannelRegister registeredChannel = null;
@@ -486,9 +505,15 @@ namespace Vrh.EventHub.Core
             HandlerRegister existingHandlerRegister = null;
             lock (registeredChannel.Channel.Handlers)
             {
-                existingHandlerRegister =
-                    registeredChannel.Channel.Handlers.FirstOrDefault(x => x.MessageType == handlerRegister.MessageType
-                                                                            && x.ReturnType == handlerRegister.ReturnType);
+                Func<HandlerRegister, bool> registerPredicate = (x) => x.MessageType == handlerRegister.MessageType 
+                                                                        && x.ReturnType == handlerRegister.ReturnType;
+                if (!overrideHandler)
+                {
+                    registerPredicate = (x) => x.MessageType == handlerRegister.MessageType 
+                                                && x.ReturnType == handlerRegister.ReturnType
+                                                && x.Handler == handlerRegister.Handler;
+                }
+                existingHandlerRegister = registeredChannel.Channel.Handlers.FirstOrDefault(registerPredicate);
                 if (existingHandlerRegister != null)
                 {
                     existingHandlerRegister.Dispose();
@@ -541,7 +566,8 @@ namespace Vrh.EventHub.Core
                 {
                     existingHandlerRegister =
                         registeredChannel.Channel.Handlers.FirstOrDefault(x => x.MessageType == handlerRegister.MessageType
-                                                                                && x.ReturnType == handlerRegister.ReturnType);
+                                                                                && x.ReturnType == handlerRegister.ReturnType
+                                                                                && x.Handler == handlerRegister.Handler);
                     if (existingHandlerRegister != null)
                     {
                         existingHandlerRegister.Dispose();
@@ -577,7 +603,7 @@ namespace Vrh.EventHub.Core
         private static readonly Lazy<EventHubCoreConfig> _lazyEventHubCoreConfiguration = new Lazy<EventHubCoreConfig>(() =>
         {
             string config = ConfigurationManager.AppSettings[$"{MODUL_PREFIX}:Config"];
-            if (String.IsNullOrEmpty(config))
+            if (string.IsNullOrEmpty(config))
             {
                 config = "Vrh.EventHub.Core.Config.xml/Vrh.EventHub.Core";
             }
