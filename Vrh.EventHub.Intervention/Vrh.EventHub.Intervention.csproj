@@ -67,7 +67,7 @@
   <ItemGroup>
     <Compile Include="EventHubIntervention.cs" />
     <Compile Include="InterventionContract.cs" />
-    <Compile Include="InterventionHandlerStore.cs" />
+    <Compile Include="InterventionHandlerRegistration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

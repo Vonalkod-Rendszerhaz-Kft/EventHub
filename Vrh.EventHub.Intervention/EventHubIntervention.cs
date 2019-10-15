@@ -28,15 +28,15 @@ namespace Vrh.EventHub.Intervention
         {
             lock (staticLocker)
             {
-                var existingHandler = handlers.FirstOrDefault(x => x.ChannelId == channelId);
+                var existingHandler = ivHandlerRegistrationStore.FirstOrDefault(x => x.ChannelId == channelId);
                 if (existingHandler != null)
                 {
-                    DropInterventionChannel(channelId);
+                    DropInterventionChannelRegistration(channelId);
                 }
                 EventHubCore.RegisterHandler<RedisPubSubChannel,
                                                 InterventionContract.InterventionRequest,
                                                 InterventionContract.InterventionResponse>(channelId, HandlerDistributorFunc);
-                handlers.Add(new InterventionHandlerStore() { ChannelId = channelId, Handler = handler });
+                ivHandlerRegistrationStore.Add(new InterventionHandlerRegistration() { ChannelId = channelId, Handler = handler });
             }
         }
 
@@ -45,17 +45,17 @@ namespace Vrh.EventHub.Intervention
         ///     (Feldolgozó oldalon használjuk!)
         /// </summary>
         /// <param name="channelId">A megszüntetendő beavatkozás csatorna</param>
-        public static void DropInterventionChannel(string channelId)
+        public static void DropInterventionChannelRegistration(string channelId)
         {
             lock(staticLocker)
             {
-                var existingHandler = handlers.FirstOrDefault(x => x.ChannelId == channelId);
+                var existingHandler = ivHandlerRegistrationStore.FirstOrDefault(x => x.ChannelId == channelId);
                 if (existingHandler != null)
                 {
                     EventHubCore.DropHandler<RedisPubSubChannel, 
                                                 InterventionContract.InterventionRequest, 
                                                 InterventionContract.InterventionResponse>(channelId, HandlerDistributorFunc);
-                    handlers.Remove(existingHandler);
+                    ivHandlerRegistrationStore.Remove(existingHandler);
                 }                
             }
         }
@@ -89,7 +89,7 @@ namespace Vrh.EventHub.Intervention
             lock (staticLocker)
             {
                 var response = request.MyResponse;
-                var handler = handlers.FirstOrDefault(x => x.ChannelId == request.RequestContent.ChannelId);
+                var handler = ivHandlerRegistrationStore.FirstOrDefault(x => x.ChannelId == request.RequestContent.ChannelId);
                 if (handler != null)
                 {
                     try
@@ -116,7 +116,7 @@ namespace Vrh.EventHub.Intervention
         /// <summary>
         /// Végpontban (alkalmazástérben) létező beavatkozás csatornák listája
         /// </summary>
-        private static readonly List<InterventionHandlerStore> handlers = new List<InterventionHandlerStore>();
+        private static readonly List<InterventionHandlerRegistration> ivHandlerRegistrationStore = new List<InterventionHandlerRegistration>();
 
         /// <summary>
         /// Osztály szintű locker

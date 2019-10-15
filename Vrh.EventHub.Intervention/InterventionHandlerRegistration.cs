@@ -9,7 +9,7 @@ namespace Vrh.EventHub.Intervention
     /// <summary>
     /// Beavatkozás kezelő regisztrációk tárolására szolgáló osztály
     /// </summary>
-    internal class InterventionHandlerStore
+    internal class InterventionHandlerRegistration
     {
         /// <summary>
         /// Csatorna azonosító

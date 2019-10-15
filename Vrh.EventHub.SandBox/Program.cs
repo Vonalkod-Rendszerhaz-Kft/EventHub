@@ -18,6 +18,11 @@ namespace Vrh.EventHub.SandBox
     {
         static void Main(string[] args)
         {
+            Console.ReadKey();
+            var d = new Dictionary<string, string>();
+            d.Add("A", "a");
+            d.Add("B", "b");
+            d.Add("A", "a");
             //var rp = new ReferencePingPong(100);
 
             //var p = new PingPong<InsideApplicationChannel>(100);
