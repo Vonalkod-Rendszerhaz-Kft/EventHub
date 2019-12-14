@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 using Vrh.EventHub.Core;
 using Vrh.EventHub.Protocols.RedisPubSub;
 using Vrh.EventHub.Protocols.InsideApplication;
-using Vrh.Logger;
 using StackExchange.Redis;
 using Newtonsoft.Json.Serialization;
 using System.ComponentModel;

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Vrh.LinqXMLProcessor.Base;
+using Vrh.XmlProcessing;
 using System.Configuration;
 
 namespace Vrh.EventHub.Protocols.InsideApplication
 {
-    internal class EventHubInsideApplicationConfig : LinqXMLProcessorBaseClass
+    internal class EventHubInsideApplicationConfig : LinqXMLProcessorBase
     {
         /// <summary>
         /// Constructor 

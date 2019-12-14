@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Configuration;
-using Vrh.LinqXMLProcessor.Base;
+using Vrh.XmlProcessing;
 
 namespace Vrh.EventHub.Core
 {
     /// <summary>
     /// Az EventHub konfigurációját hordozó (kiolvasó) típus
     /// </summary>
-    internal class EventHubCoreConfig : LinqXMLProcessorBaseClass
+    internal class EventHubCoreConfig : LinqXMLProcessorBase
     {
         /// <summary>
         /// Constructor 

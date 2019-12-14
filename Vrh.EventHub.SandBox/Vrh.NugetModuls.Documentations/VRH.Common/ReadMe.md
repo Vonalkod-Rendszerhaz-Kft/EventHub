@@ -187,6 +187,10 @@ public class SelectListGroup
 
 # Version History:
 
+## 2.10.0 (2019.10.08):      
+### Compatibility API changes:      
+- ToEnum string extension hozzáadása, amelyik egy stringből megadott tipusú enumra konvertál, vagy a típus (Enum) defaultját adja
+
 ## 2.9.0 (2019.09.12):      
 ### Compatibility API changes:      
 - EntryAsseblyFixer static class hozzáadása, ami beállítja  amegfelelő EntryAssembly-t, ha az alakalmazás tér dinamikus hostolású, ahol null, vagy dynamic az EntryAssembly

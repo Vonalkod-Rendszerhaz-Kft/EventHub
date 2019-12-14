@@ -11,9 +11,11 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-      1.0.0 (2019.09.25)
-      Initial version
-    </releaseNotes>
+			2.0.0 (2019.12.14)
+			- XmlProcesing-et használó komponens-verziók beépítése
+			1.0.0 (2019.09.25)
+			Initial version
+		</releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/redispubsub</projectUrl>
     <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/EventHubIntervention.png</iconUrl>
   </metadata>

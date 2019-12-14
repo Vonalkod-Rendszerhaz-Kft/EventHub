@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Configuration;
-using Vrh.LinqXMLProcessor.Base;
+using Vrh.XmlProcessing;
 
 namespace Vrh.EventHub.Protocols.RedisPubSub
 {
-    internal class EventHubRedisPubSubConfig : LinqXMLProcessorBaseClass
+    internal class EventHubRedisPubSubConfig : LinqXMLProcessorBase
     {
         /// <summary>
         /// Constructor 
