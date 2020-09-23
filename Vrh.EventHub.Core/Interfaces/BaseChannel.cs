@@ -76,49 +76,49 @@ namespace Vrh.EventHub.Core
                 }
             }
             IEnumerable<HandlerRegister> handlers = null;
-            lock (Handlers)
-            {
-                handlers = Handlers.Where(x => x.MessageType.AssemblyQualifiedName == msg.MessageType
-                                                        && x.ReturnType.AssemblyQualifiedName == msg.ReturnType);
-            }
-            if (handlers != null)
-            {
-                int i = 0;
-                foreach (var handler in handlers)
-                {
-                    i++;
-                    logData.Add($"Called handler #{i}", handler.Handler.Method.Name);
-                    if (handler.ReturnType == typeof(void))
-                    {
-                        handler.Handler.Method.Invoke(handler.Handler.Target, (new object[] { concrateMessage }));
-                        VrhLogger.Log("Message receive and call handler async succesfull.",
-                            logData, null, LogLevel.Verbose, this.GetType());
-                    }
-                    else
-                    {
-                        try
-                        {
-                            var result = handler.Handler.Method.Invoke(handler.Handler.Target, new object[] { concrateMessage });
-                            Send(new EventHubMessage()
-                            {
-                                ConcrateMessage = JsonConvert.SerializeObject(result),
-                                MessageType = result.GetType().AssemblyQualifiedName,
-                                ReturnType = typeof(void).AssemblyQualifiedName,
-                            });
-                        }
-                        catch (Exception e)
-                        {
-                            VrhLogger.Log("Call handler succes, by unwanted exception recieve from handler methode!",
-                                logData, e, LogLevel.Error, this.GetType());
-                        }
-                    }
-                }
-            }
-            else
-            {
-                VrhLogger.Log("Message receive but handler not registered in this side of channel!",
-                    logData, null, LogLevel.Debug, this.GetType());
-            }
+			lock (Handlers)
+			{
+				handlers = Handlers.Where(x => x.MessageType.AssemblyQualifiedName == msg.MessageType
+														&& x.ReturnType.AssemblyQualifiedName == msg.ReturnType);
+				if (handlers != null)
+				{
+					int i = 0;
+					foreach (var handler in handlers)
+					{
+						i++;
+						logData.Add($"Called handler #{i}", handler.Handler.Method.Name);
+						if (handler.ReturnType == typeof(void))
+						{
+							handler.Handler.Method.Invoke(handler.Handler.Target, (new object[] { concrateMessage }));
+							VrhLogger.Log("Message receive and call handler async succesfull.",
+								logData, null, LogLevel.Verbose, this.GetType());
+						}
+						else
+						{
+							try
+							{
+								var result = handler.Handler.Method.Invoke(handler.Handler.Target, new object[] { concrateMessage });
+								Send(new EventHubMessage()
+								{
+									ConcrateMessage = JsonConvert.SerializeObject(result),
+									MessageType = result.GetType().AssemblyQualifiedName,
+									ReturnType = typeof(void).AssemblyQualifiedName,
+								});
+							}
+							catch (Exception e)
+							{
+								VrhLogger.Log("Call handler succes, by unwanted exception recieve from handler methode!",
+									logData, e, LogLevel.Error, this.GetType());
+							}
+						}
+					}
+				}
+				else
+				{
+					VrhLogger.Log("Message receive but handler not registered in this side of channel!",
+						logData, null, LogLevel.Debug, this.GetType());
+				}
+			}
         }
 
         /// <summary>

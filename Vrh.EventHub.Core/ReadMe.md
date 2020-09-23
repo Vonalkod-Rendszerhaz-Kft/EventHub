@@ -1278,6 +1278,13 @@ Handler bejegyzési költségek üzenetfogadó végpontban:
 <hr></hr>
 
 ## Version History:
+### 1.2.2 (2020.09.23)
+(BPW PTS2, ReelCheck compatity version!)
+
+Patches:
+- Drop handlers ciklusok közben az üzenettovábítások hibárafuthattak a forech call-ban metódus referncialista változása miatt, mert nem volt lockolva a teljes végighívási folymat.
+### 1.2.1 (2019.11.30) Pathces:
+- A Vrh.LinqXMLProcessor.Base 1.2.4 csomagtól való függés beállítása.
 ### 1.2.0 (2019.09.25)
 Compatibility API changes:
 - Lehetőség van rá előírni, hogy a handler register figyelembe vegye a regisztrált handlert is, és nem írja felül, ha nem egyezik egy korábban regisztráltal. Ennek segítségével lehet ugyanabban az alkalmazás térben többszörös handlereket üzemeltetni ugyanarra a contractra. (Nincs rá további built-in támogatás ezért szinkron call-oknál nincs értelme. Ezért a lehetőség a szinkron call regisztrációknál továbbra sem érhető el!!!)
