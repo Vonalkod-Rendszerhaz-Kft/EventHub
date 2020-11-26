@@ -16,11 +16,11 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
     /// </summary>
     public class RedisPubSubChannel : BaseChannel
     {
-        /// <summary>
-        /// Megmondja, hogy megvan-er  akapcsolat a Redis kiszolgáló felé
-        /// </summary>
-        /// <returns></returns>
-        static bool RedisPubSubChannelConnected()
+		/// <summary>
+		/// Megmondja, hogy megvan-er  akapcsolat a Redis kiszolgáló felé
+		/// </summary>
+		/// <returns></returns>
+		static bool RedisPubSubChannelConnected()
         {
             return Connection.IsConnected;            
         }
@@ -41,8 +41,8 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
         }
 
         private static readonly Lazy<ConnectionMultiplexer> lazyConnection = new Lazy<ConnectionMultiplexer>(() => {
-            var configfile = new EventHubRedisPubSubConfig(GetConfigFile());
-            return ConnectionMultiplexer.Connect(configfile.RedisConnection);
+            var configfile = new EventHubRedisPubSubConfig(GetXmlConnectionString(),redisconnection,redisconnectiontimeout);
+			return ConnectionMultiplexer.Connect(configfile.RedisConnection);
         });
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
         /// <returns></returns>
         public override TimeSpan GetChannelTimout()
         {
-            return Configuration.ChannelTimeout;
+            return redisconnectiontimeout==null? Configuration.ChannelTimeout : (TimeSpan)redisconnectiontimeout;
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
                 {
                     if (_configuration == null)
                     {
-                        _configuration = new EventHubRedisPubSubConfig(ConfigFile);
+                        _configuration = new EventHubRedisPubSubConfig(ConfigFile,redisconnection,redisconnectiontimeout);
                     }
                     return _configuration;
                 }
@@ -170,7 +170,7 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
         {
             get
             {
-                string config = GetConfigFile();
+                string config = GetXmlConnectionString();
                 VrhLogger.Log(
                     $"Used EventHub.RedisPubSub channel configuration: {config}",
                     new Dictionary<string, string>()
@@ -185,26 +185,39 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
             }
         }
 
-        /// <summary>
-        /// Visszaadja a használt config fájl nevét
-        /// </summary>
-        /// <returns>Config fájl név</returns>
-        private static string GetConfigFile()
+		/// <summary>
+		/// A használandó xml paraméter struktúrára mutató xml kapcsolat leíró
+		/// </summary>
+		/// <param name="xmlcs"></param>
+		public static void SetXmlConnectionString(string xmlcs) { xmlconnectionstring = string.IsNullOrWhiteSpace(xmlcs) ? null : xmlcs; }
+
+		/// <summary>
+		/// A használandó paraméterek közvetlen beállítása
+		/// </summary>
+		/// <param name="rcs"></param>
+		/// <param name="to"></param>
+		public static void SetParameters(string rcs, TimeSpan? to = null) { redisconnection = rcs; redisconnectiontimeout=to ; }
+		/// <summary>
+		/// Visszaadja a használt config fájl nevét
+		/// </summary>
+		/// <returns>Config fájl név</returns>
+		private static string GetXmlConnectionString()
         {
             string config = ConfigurationManager.AppSettings[$"{MODUL_PREFIX}:Config"];
-            if (string.IsNullOrEmpty(config))
-            {
-                config = "Vrh.EventHub.RedisPubSub.Config.xml/Vrh.EventHub.RedisPubSub";
-            }
+			if (string.IsNullOrEmpty(config)) { config = xmlconnectionstring; }
+			if (string.IsNullOrEmpty(config)) { config = "Vrh.EventHub.RedisPubSub.Config.xml/Vrh.EventHub.RedisPubSub"; }
             return config;
         }
+		private static string xmlconnectionstring = null;
+		private static string redisconnection = null;
+		private static TimeSpan? redisconnectiontimeout = null;
 
-        #region IDisposable Support
-        /// <summary>
-        /// Part of Dispose pattern
-        /// </summary>
-        /// <param name="disposing">más dispos-ol?</param>
-        protected override void Dispose(bool disposing)
+		#region IDisposable Support
+		/// <summary>
+		/// Part of Dispose pattern
+		/// </summary>
+		/// <param name="disposing">más dispos-ol?</param>
+		protected override void Dispose(bool disposing)
         {
             PubSub.Unsubscribe(ChannelId);
             base.Dispose(disposing);

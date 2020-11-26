@@ -11,12 +11,15 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-			3.0.0 (2019.12.14)
-			- XmlProcessing-et használó komponens-verziók használata (Vrh.Logger)
-			2.0.7 (2019.09.25)
-			Patches:
-			1. Upgrade EventHub.Core to v1.2.0
-		</releaseNotes>
+	  3.0.1 (2020.11.26, nuget)
+	  - xml parser connectionstring megadásához szükséges metódus (RedisPubSubChannel.SetXmlConnectionString) kialakítása
+	  - a paraméterek közvetlen megadásához szükséges metódus kialakítása
+	  3.0.0 (2019.12.14)
+	  - XmlProcessing-et használó komponens-verziók használata (Vrh.Logger)
+	  2.0.7 (2019.09.25)
+	  Patches:
+	  1. Upgrade EventHub.Core to v1.2.0
+	</releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/redispubsub</projectUrl>
     <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/eventhubredispubsub.png</iconUrl>
   </metadata>

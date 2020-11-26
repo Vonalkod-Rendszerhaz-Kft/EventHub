@@ -10,25 +10,33 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
         /// Constructor 
         /// </summary>
         /// <param name="parameterFile">XML fájl aminek a feldolgozására az osztály készül</param>
-        internal EventHubRedisPubSubConfig(string parameterFile)
-        {
-            _xmlFileDefinition = parameterFile;
-        }
+        internal EventHubRedisPubSubConfig(string parameterFile):base(parameterFile) { }
+		/// <summary>
+		/// Constructor 
+		/// </summary>
+		/// <param name="parameterFile">XML fájl aminek a feldolgozására az osztály készül</param>
+		/// <param name="redisconnectionstring">XML fájl aminek a feldolgozására az osztály készül</param>
+		/// <param name="timeout">XML fájl aminek a feldolgozására az osztály készül</param>
+		internal EventHubRedisPubSubConfig(string parameterFile, string redisconnectionstring=null, TimeSpan? timeout=null) : base(parameterFile)
+		{
+			_timeout = timeout;
+			_redisconnectionstring = redisconnectionstring;
+		}
 
-        #region Retrive information from XML
+		private string _redisconnectionstring = null;
+		private TimeSpan? _timeout = null;
+		#region Retrive information from XML
 
-        /// <summary>
-        /// A modul által használt redis connection alias
-        /// </summary>
-        internal string RedisConnection
+		/// <summary>
+		/// A modul által használt redis connection alias
+		/// </summary>
+		internal string RedisConnection
         {
             get
             {
                 string redisConnection = ConfigurationManager.AppSettings[RedisPubSubChannel.MODUL_PREFIX + ":" + Me.RedisConnectionAliasElement.NAME];
-                if (String.IsNullOrEmpty(redisConnection))
-                {
-                    redisConnection = GetElementValue(GetXElement(Me.RedisConnectionAliasElement.NAME), "localhost");
-                }
+				if (String.IsNullOrEmpty(redisConnection)) { redisConnection = _redisconnectionstring; }
+				if (String.IsNullOrEmpty(redisConnection)) { redisConnection = GetValue(GetXElement(Me.RedisConnectionAliasElement.NAME), "localhost"); }
                 return redisConnection;
             }
         }
@@ -41,11 +49,9 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
             get
             {
                 string timoutStr = ConfigurationManager.AppSettings[RedisPubSubChannel.MODUL_PREFIX + ":" + Me.ChannelTimoutElement.NAME];
-                TimeSpan timeout = new TimeSpan(0, 0, 1);
-                if(!TimeSpan.TryParse(timoutStr, out timeout))
-                {
-                    timeout = GetElementValue<TimeSpan>(GetXElement(Me.ChannelTimoutElement.NAME), new TimeSpan(0, 0, 1));
-                }
+				TimeSpan timeout;
+				if (timoutStr == null) { timeout = (TimeSpan)_timeout; }
+				else if (!TimeSpan.TryParse(timoutStr, out timeout)) { timeout = GetValue<TimeSpan>(GetXElement(Me.ChannelTimoutElement.NAME), new TimeSpan(0, 0, 1)); }
                 return timeout;
             }
         }

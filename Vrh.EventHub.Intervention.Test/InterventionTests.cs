@@ -37,7 +37,7 @@ namespace Vrh.EventHub.Intervention.Test
         [ExpectedException(typeof(FatalEventHubException))]
         public void DropHandlerWork()
         {
-            EventHubIntervention.DropInterventionChannel(CHANNEL_NAME);
+            //EventHubIntervention.DropInterventionChannel(CHANNEL_NAME);
             CallIntervention(CHANNEL_NAME, 1);
         }
 
