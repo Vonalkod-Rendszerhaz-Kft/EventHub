@@ -11,6 +11,7 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
+	  3.1.2 (2020.11.30, nuget)patch,upgrades
 	  3.1.1 (2020.11.30, nuget)
 	  - kimaradt a connectionstring store név feloldása, ez került kijavításra
 	  3.1.0 (2020.11.26, nuget)

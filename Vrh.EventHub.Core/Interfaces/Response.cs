@@ -34,7 +34,7 @@ namespace Vrh.EventHub.Core
         /// Hiba esetén kell tartalmazni egy Exceprtion-t, vagy egy Exception leszéármazottat
         /// Ha nincs hiba akkor kötelezően null
         /// </summary>
-        public EventHubResponseException Exception { get; set; } = null;
+        public Exception Exception { get; set; } = null;
 
         /// <summary>
         /// Üzenet azonosító (a request-tel párosítja)

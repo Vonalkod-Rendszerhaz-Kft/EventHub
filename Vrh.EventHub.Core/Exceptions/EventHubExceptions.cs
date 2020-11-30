@@ -5,24 +5,10 @@ using Vrh.Logger;
 
 namespace Vrh.EventHub.Core
 {
-	#region GenericEventHubException Exception
-	/// <summary>
-	/// Osztály az alkalmazásban az EventHub Response-ba elhelyezendő exception-öknek
-	/// </summary>
-	[Serializable]
-	public class EventHubResponseException : Exception
-	{
-		public EventHubResponseException() : base(){}
-		public EventHubResponseException(string message) : base(message){}
-		public EventHubResponseException(string message, Exception ex) : base(message, ex){}
-		public EventHubResponseException(System.Runtime.Serialization.SerializationInfo serinfo, System.Runtime.Serialization.StreamingContext serctx) : base(serinfo, serctx) { }
-	}
-	#endregion GenericEventHubException Exception
-
 	/// <summary>
 	/// EventHub exception base class (A beállításoktól függőne lenyeli, vagy dobja az ilyen exception-öket)
 	/// </summary>
-	public class EventHubException : EventHubResponseException
+	public class EventHubException : Exception
 	{
         /// <summary>
         /// A beállításokanak megfelelően exceptiont dob, vagy logolja  ahibát

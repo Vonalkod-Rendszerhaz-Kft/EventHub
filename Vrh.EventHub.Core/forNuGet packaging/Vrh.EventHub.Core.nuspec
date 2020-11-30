@@ -11,6 +11,10 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
+	  2.0.1 (2020.11.30) back to previous version:
+	  - a verzió emelést kiváltó módosítás indokolatlan volt és felesleges
+	  - vissza a 2.x.x verzióra
+	  
 	  3.0.1 (2020.11.30) Pathces:
 	  3.0.0 (2020.11.30) new version:
 	  - Vrh.EventHub.Core.EventHubResponseException típus bevezetése; az EventHubException is ebből származik
