@@ -11,15 +11,18 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-			2.0.0 (2019.12.14)
-			- XmlParser kompatibilis, és minden nugetből a legfrisebbet használja
-			1.2.0 (2019.09.25)
-			Compatibility API changes:
-			- Lehetőség van rá előírni, hogy a handler register figyelembe vegye a regisztrált handlert is, és nem írja felül, ha nem egyezik egy korábban regisztráltal. Ennek segítségével lehet ugyanabban az alkalmazás térben többszörös handlereket üzemeltetni ugyanarra a contractra. (Nincs rá további built-in támogatás ezért szinkron call-oknál nincs értelme. Ezért a lehetőség a szinkron call regisztrációknál továbbra sem érhető el!!!)
+	  3.0.0 (2020.11.30) Pathces:
+	  - Vrh.EventHub.Core.EventHubResponseException típus bevezetése; az EventHubException is ebből származik
+	  - (emiatt v3.0.0.) A Response.Exception field típusa EventHubResponseException-re változott, mert a normál Exceptionök serializálásában hiba keletkez(he)tett a [Serializable] attributum hiánya miatt.
+	  2.0.0 (2019.12.14)
+	  - XmlParser kompatibilis, és minden nugetből a legfrisebbet használja
+	  1.2.0 (2019.09.25)
+	  Compatibility API changes:
+	  - Lehetőség van rá előírni, hogy a handler register figyelembe vegye a regisztrált handlert is, és nem írja felül, ha nem egyezik egy korábban regisztráltal. Ennek segítségével lehet ugyanabban az alkalmazás térben többszörös handlereket üzemeltetni ugyanarra a contractra. (Nincs rá további built-in támogatás ezért szinkron call-oknál nincs értelme. Ezért a lehetőség a szinkron call regisztrációknál továbbra sem érhető el!!!)
 
-			Patches:
-			- Ha több handler van regisztrrálva egy végponton, akkor az EventHub.Core gondoskodik róla, hogy az érkező üzenetekre az összes regisztrált kezelőt végighívja.
-		</releaseNotes>
+	  Patches:
+	  - Ha több handler van regisztrrálva egy végponton, akkor az EventHub.Core gondoskodik róla, hogy az érkező üzenetekre az összes regisztrált kezelőt végighívja.
+	</releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/vrh-eventhub-core</projectUrl>
     <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/eventhub.png</iconUrl>
   </metadata>

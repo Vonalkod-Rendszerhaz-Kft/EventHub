@@ -11,7 +11,9 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-	  3.0.1 (2020.11.26, nuget)
+	  3.1.1 (2020.11.30, nuget)
+	  - kimaradt a connectionstring store név feloldása, ez került kijavításra
+	  3.1.0 (2020.11.26, nuget)
 	  - xml parser connectionstring megadásához szükséges metódus (RedisPubSubChannel.SetXmlConnectionString) kialakítása
 	  - a paraméterek közvetlen megadásához szükséges metódus kialakítása
 	  3.0.0 (2019.12.14)

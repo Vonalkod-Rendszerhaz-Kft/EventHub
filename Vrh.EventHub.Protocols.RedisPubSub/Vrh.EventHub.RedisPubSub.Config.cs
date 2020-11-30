@@ -37,7 +37,8 @@ namespace Vrh.EventHub.Protocols.RedisPubSub
                 string redisConnection = ConfigurationManager.AppSettings[RedisPubSubChannel.MODUL_PREFIX + ":" + Me.RedisConnectionAliasElement.NAME];
 				if (String.IsNullOrEmpty(redisConnection)) { redisConnection = _redisconnectionstring; }
 				if (String.IsNullOrEmpty(redisConnection)) { redisConnection = GetValue(GetXElement(Me.RedisConnectionAliasElement.NAME), "localhost"); }
-                return redisConnection;
+				try { redisConnection = Vrh.XmlProcessing.ConnectionStringStore.GetRedisCM(redisConnection); } catch { }
+				return redisConnection;
             }
         }
 
