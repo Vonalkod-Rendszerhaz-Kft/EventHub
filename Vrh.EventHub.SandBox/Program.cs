@@ -170,7 +170,7 @@ namespace Vrh.EventHub.SandBox
             }
             catch (Exception e)
             {
-                response.Exception = e;
+                response.Exception = new EventHubException($"In {nameof(Add)}", e);
             }
             return response;
         }
@@ -185,9 +185,9 @@ namespace Vrh.EventHub.SandBox
             }
             catch (Exception e)
             {
-                response.Exception = e;
-            }
-            return response;
+				response.Exception = new EventHubException($"In {nameof(Multiplication)}", e);
+			}
+			return response;
         }
     }
 

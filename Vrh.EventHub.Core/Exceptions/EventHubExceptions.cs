@@ -15,6 +15,7 @@ namespace Vrh.EventHub.Core
 		public EventHubResponseException() : base(){}
 		public EventHubResponseException(string message) : base(message){}
 		public EventHubResponseException(string message, Exception ex) : base(message, ex){}
+		public EventHubResponseException(System.Runtime.Serialization.SerializationInfo serinfo, System.Runtime.Serialization.StreamingContext serctx) : base(serinfo, serctx) { }
 	}
 	#endregion GenericEventHubException Exception
 

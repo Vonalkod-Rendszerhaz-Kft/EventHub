@@ -11,7 +11,8 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-	  3.0.0 (2020.11.30) Pathces:
+	  3.0.1 (2020.11.30) Pathces:
+	  3.0.0 (2020.11.30) new version:
 	  - Vrh.EventHub.Core.EventHubResponseException típus bevezetése; az EventHubException is ebből származik
 	  - (emiatt v3.0.0.) A Response.Exception field típusa EventHubResponseException-re változott, mert a normál Exceptionök serializálásában hiba keletkez(he)tett a [Serializable] attributum hiánya miatt.
 	  2.0.0 (2019.12.14)
