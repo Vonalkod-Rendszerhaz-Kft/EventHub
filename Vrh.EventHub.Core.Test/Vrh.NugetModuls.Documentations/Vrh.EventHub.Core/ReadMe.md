@@ -1278,6 +1278,16 @@ Handler bejegyzési költségek üzenetfogadó végpontban:
 <hr></hr>
 
 ## Version History:
+### 3.0.0 (2019.12.14) Pathces:
+- A RedisPubSubChannel XmlParser kompatibilis; az AppSettingsben XmlParser kapcsolat leíróval is megadható a paraméter struktúra helye.
+- Új metódus: RedisPubSubChannel.SetParameters(string xmlcs, TimeSpan? to) hívásban megadható az a RedisCM típusú kapcsolat leíró, és a ChannelTimeout értéke, amelyet használnia kell.
+Ha ezek bármelyike meg van adva, akkor nem az appsettingsben megadott paramétert használja, hanem az itt megadottat.
+- RedisPubSubChannel.SetXmlConnectionString(string xmlcs) hívásban megadható az az XmlParser connections string, ahol a paraméterek szerepelnek. Ha ez meg van adva, akkor nem 
+az appsettingsben megadott paramétert használja, hanem az itt megadottat.
+- Vrh.EventHub.Core.EventHubResponseException típus bevezetése; az EventHubException is ebből származik
+- (emiatt v3.0.0.) A Response.Exception field típusa EventHubResponseException-re változott, mert a normál Exceptionök serializálásában hiba keletkez(he)tett a [Serializable] attributum hiánya miatt.
+### 1.2.1 (2019.11.30) Pathces:
+- A Vrh.LinqXMLProcessor.Base 1.2.4 csomagtól való függés beállítása.
 ### 1.2.0 (2019.09.25)
 Compatibility API changes:
 - Lehetőség van rá előírni, hogy a handler register figyelembe vegye a regisztrált handlert is, és nem írja felül, ha nem egyezik egy korábban regisztráltal. Ennek segítségével lehet ugyanabban az alkalmazás térben többszörös handlereket üzemeltetni ugyanarra a contractra. (Nincs rá további built-in támogatás ezért szinkron call-oknál nincs értelme. Ezért a lehetőség a szinkron call regisztrációknál továbbra sem érhető el!!!)

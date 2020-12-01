@@ -67,20 +67,20 @@
     <Reference Include="VRH.Common, Version=2.19.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.Common.2.19.0\lib\net45\VRH.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.EventHub.Core, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.EventHub.Core.2.0.0\lib\net451\Vrh.EventHub.Core.dll</HintPath>
+    <Reference Include="Vrh.EventHub.Core, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.EventHub.Core.2.0.1\lib\net451\Vrh.EventHub.Core.dll</HintPath>
     </Reference>
     <Reference Include="Vrh.EventHub.Intervention, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.EventHub.Intervention.2.0.0\lib\net451\Vrh.EventHub.Intervention.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.EventHub.Protocols.RedisPubSub, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.EventHub.Protocols.RedisPubSub.3.0.0\lib\net451\Vrh.EventHub.Protocols.RedisPubSub.dll</HintPath>
+    <Reference Include="Vrh.EventHub.Protocols.RedisPubSub, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.EventHub.Protocols.RedisPubSub.3.1.2\lib\net451\Vrh.EventHub.Protocols.RedisPubSub.dll</HintPath>
     </Reference>
     <Reference Include="Vrh.Logger, Version=2.5.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.Logger.2.5.3\lib\net451\Vrh.Logger.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.XmlProcessing, Version=1.20.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.XmlProcessing.1.20.0\lib\net45\Vrh.XmlProcessing.dll</HintPath>
+    <Reference Include="Vrh.XmlProcessing, Version=1.21.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.XmlProcessing.1.21.0\lib\net45\Vrh.XmlProcessing.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -95,11 +95,6 @@
     <None Include="Vrh.NugetModuls.Documentations\Vrh.EventHub.Intervention\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.EventHub.Protocols.RedisPubSub\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Vrh.EventHub.Core.Config.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="LogConfig.xml">

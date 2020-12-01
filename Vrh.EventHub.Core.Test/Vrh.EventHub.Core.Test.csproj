@@ -54,8 +54,8 @@
     <Reference Include="VRH.Common, Version=2.19.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.Common.2.19.0\lib\net45\VRH.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.EventHub.Core, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.EventHub.Core.2.0.0\lib\net451\Vrh.EventHub.Core.dll</HintPath>
+    <Reference Include="Vrh.EventHub.Core, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.EventHub.Core.2.0.1\lib\net451\Vrh.EventHub.Core.dll</HintPath>
     </Reference>
     <Reference Include="Vrh.Logger, Version=2.5.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.Logger.2.5.3\lib\net451\Vrh.Logger.dll</HintPath>
@@ -64,8 +64,8 @@
       <HintPath>..\packages\Vrh.UnitTest.Base.1.0.0\lib\net40\Vrh.UnitTest.Base.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vrh.XmlProcessing, Version=1.20.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.XmlProcessing.1.20.0\lib\net45\Vrh.XmlProcessing.dll</HintPath>
+    <Reference Include="Vrh.XmlProcessing, Version=1.21.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.XmlProcessing.1.21.0\lib\net45\Vrh.XmlProcessing.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Choose>
@@ -109,17 +109,12 @@
     <None Include="Vrh.NugetModuls.Documentations\Vrh.XmlProcessing\ReadMe.md" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Vrh.EventHub.Core.Config.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="XmlParser.xml">
+    <None Include="LogConfig.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="LogConfig.xml">
+    <None Include="XmlParser.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
